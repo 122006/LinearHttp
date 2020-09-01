@@ -3,12 +3,18 @@ package com.by122006;
 import com.alibaba.fastjson.JSONObject;
 import com.annimon.stream.function.Function;
 import com.by122006.exceptions.FailException;
+import com.by122006.interfaces.HttpAction;
 
 
 /**
  * Created by admin on 2020/4/10.
  */
-public class Web<R extends IHttpRequest> {
+public class LinearHttp<R extends IHttpRequest> {
+    public static <T extends HttpAction> void init(T httpAction){
+        ACTIVE_HTTP_ACTION=httpAction;
+    }
+
+    public static HttpAction ACTIVE_HTTP_ACTION = null;
     private final R request;
     //    private CallBack<JSON> callBack;
 
@@ -18,19 +24,19 @@ public class Web<R extends IHttpRequest> {
 //        return this;
 //    }
 
-    private Web(R request) {
+    private LinearHttp(R request) {
         this.request = request;
     }
 
-    public static <R extends IHttpRequest> Web<R> create(Class<R> rClass) {
-        Web<R> web = null;
+    public static <R extends IHttpRequest> LinearHttp<R> create(Class<R> rClass) {
+        LinearHttp<R> linearHttp = null;
         try {
-            web = new Web<R>(rClass.newInstance());
+            linearHttp = new LinearHttp<R>(rClass.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("web请求配置错误");
         }
-        return web;
+        return linearHttp;
     }
 
     public interface CallBack<M> {
@@ -46,10 +52,10 @@ public class Web<R extends IHttpRequest> {
     public static class ResultBody<T> {
 
         private final ResultAction<T> result;
-        Web web;
+        LinearHttp linearHttp;
 
-        public ResultBody(Web web, ResultAction<T> result) {
-            this.web = web;
+        public ResultBody(LinearHttp linearHttp, ResultAction<T> result) {
+            this.linearHttp = linearHttp;
             this.result = result;
         }
 
@@ -74,22 +80,22 @@ public class Web<R extends IHttpRequest> {
                 try {
                     data = result.action();
                 } catch (FailException e) {
-                    if (web.failCallBack != null) web.failCallBack.action(e.error, e.getMessage());
+                    if (linearHttp.failCallBack != null) linearHttp.failCallBack.action(e.error, e.getMessage());
                     return;
                 }
-                if (web.successCallBack != null) web.successCallBack.action(data);
+                if (linearHttp.successCallBack != null) linearHttp.successCallBack.action(data);
             } catch (Exception e) {
                 e.printStackTrace();
-                if (web.errorCallBack != null) {
+                if (linearHttp.errorCallBack != null) {
                     try {
-                        web.errorCallBack.action(e);
+                        linearHttp.errorCallBack.action(e);
                     } catch (Exception exception) {
                         exception.printStackTrace();
                         throw new RuntimeException(exception);
                     }
-                } else if (web.failCallBack != null) {
+                } else if (linearHttp.failCallBack != null) {
                     try {
-                        web.failCallBack.action(Integer.MIN_VALUE, e.getMessage());
+                        linearHttp.failCallBack.action(Integer.MIN_VALUE, e.getMessage());
                     } catch (Exception exception) {
                         exception.printStackTrace();
                         throw new RuntimeException(exception);
@@ -97,7 +103,7 @@ public class Web<R extends IHttpRequest> {
                 }else throw new RuntimeException(e);
             } finally {
                 try {
-                    if (web.finallyCallBack != null) web.finallyCallBack.action();
+                    if (linearHttp.finallyCallBack != null) linearHttp.finallyCallBack.action();
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
@@ -111,7 +117,7 @@ public class Web<R extends IHttpRequest> {
 
         public ResultBody<T> selfParams(CallBack<JSONObject> paramsResultAction) {
             try {
-                paramsResultAction.action(web.request.getParams());
+                paramsResultAction.action(linearHttp.request.getParams());
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -120,7 +126,7 @@ public class Web<R extends IHttpRequest> {
         }
 
         public ResultBody<T> addParams(String key, Object value) {
-            web.request.params.put(key, value);
+            linearHttp.request.params.put(key, value);
             return this;
         }
 
@@ -130,22 +136,22 @@ public class Web<R extends IHttpRequest> {
          * @return
          */
         public ResultBody<T> setSuccessCallBack(CallBack<T> successCallBack) {
-            web.setSuccessCallBack(successCallBack);
+            linearHttp.setSuccessCallBack(successCallBack);
             return this;
         }
 
         public ResultBody<T> setFailCallBack(FailCallBack failCallBack) {
-            web.setFailCallBack(failCallBack);
+            linearHttp.setFailCallBack(failCallBack);
             return this;
         }
 
         public ResultBody<T> setErrorCallBack(ErrorCallBack errorCallBack) {
-            web.setErrorCallBack(errorCallBack);
+            linearHttp.setErrorCallBack(errorCallBack);
             return this;
         }
 
         public ResultBody<T> setFinallyCallBack(EmptyAction finallyCallBack) {
-            web.setFinallyCallBack(finallyCallBack);
+            linearHttp.setFinallyCallBack(finallyCallBack);
             return this;
         }
     }

@@ -39,7 +39,7 @@ public abstract class IHttpRequest {
             requestInfo.setHeader(headers);
             requestInfo.setCodeCheck(this::codeCheck);
             requestInfo.setMethod("POST");
-            String s = HttpAction.ACTIVE_HTTP_ACTION.action(requestInfo);
+            String s = LinearHttp.ACTIVE_HTTP_ACTION.action(requestInfo);
             return JSONObject.parseObject(s);
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,7 +60,7 @@ public abstract class IHttpRequest {
             requestInfo.setHeader(headers);
             requestInfo.setCodeCheck(this::codeCheck);
             requestInfo.setMethod("GET");
-            String s = HttpAction.ACTIVE_HTTP_ACTION.action(requestInfo);
+            String s = LinearHttp.ACTIVE_HTTP_ACTION.action(requestInfo);
             return JSONObject.parseObject(s);
         } catch (Exception e) {
             e.printStackTrace();
