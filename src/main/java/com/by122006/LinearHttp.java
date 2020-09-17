@@ -60,7 +60,7 @@ public class LinearHttp<R extends IHttpRequest> {
         }
 
 
-        public void syncExec() {
+        public void asyncExec() {
             new Thread(()->{
                 try {
                     exec();
