@@ -1,6 +1,5 @@
 package com.by122006;
 
-import com.by122006.interfaces.HttpAction;
 import lombok.experimental.Accessors;
 
 import java.lang.reflect.*;
@@ -12,7 +11,6 @@ import java.lang.reflect.*;
 @Accessors(chain = true)
 public class LinearHttp<M> {
 
-    public static HttpAction ACTIVE_HTTP_ACTION = null;
     final Class<M> requestClass;
     //    private CallBack<JSON> callBack;
 //    private Function<R , ResultAction<?>> re;
