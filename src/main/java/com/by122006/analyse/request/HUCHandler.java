@@ -1,6 +1,5 @@
 package com.by122006.analyse.request;
 
-import com.sun.deploy.uitoolkit.impl.awt.ui.SwingConsoleWindow;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
