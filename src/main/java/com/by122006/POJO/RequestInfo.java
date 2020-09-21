@@ -1,8 +1,7 @@
-package com.by122006.enums;
+package com.by122006.POJO;
 
 import com.annimon.stream.function.Consumer;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class RequestInfo {

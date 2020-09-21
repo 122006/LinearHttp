@@ -9,5 +9,8 @@ public class FailException extends RuntimeException {
         super(message);
         this.error = error;
     }
-
+    public FailException(String message) {
+        super(message);
+        this.error = Integer.MIN_VALUE;
+    }
 }
