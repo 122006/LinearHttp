@@ -23,12 +23,12 @@ public class Demo {
 
 
 @HttpRpc
-interface HttpTest {
+abstract class HttpTest {
     static String getUrl(){
         return "http://10.1.44.122:8080/sz/ads-admin";
     }
     @Get(prePath = "/deviceConnect")
-    String[] heartBeat(@Param("deviceId") int deviceId);
+    abstract String[] heartBeat(@Param("deviceId") int deviceId);
     @Post(prePath = "/deviceConnect")
-    JSONObject invokeDevice(@Param("loginKey") String loginKey, @Param("deviceMac") String deviceMac);
+    abstract JSONObject invokeDevice(@Param("loginKey") String loginKey, @Param("deviceMac") String deviceMac);
 }

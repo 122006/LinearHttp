@@ -76,7 +76,6 @@ public class ResultBody<R, M> {
             getUrl.setAccessible(true);
             classUrl= (String) getUrl.invoke(null);
         } catch (Throwable e) {
-            e.printStackTrace();
             classUrl=classAnnotation.url();
         }
         String finalClassUrl = classUrl;
