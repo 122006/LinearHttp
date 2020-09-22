@@ -165,9 +165,9 @@ public class ResultBody<R, M> {
 
     private Parameter[] getParameters(Method method) {
         //java7没有getParameters方法
-        int parameterCount = method.getParameterCount();
-        Parameter[] parameters=new Parameter[parameterCount];
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        int parameterCount = parameterAnnotations.length;
+        Parameter[] parameters=new Parameter[parameterCount];
         Class<?>[] parameterTypes = method.getParameterTypes();
         for(int i = 0; i< parameterCount; i++){
             parameters[i]=new Parameter();
