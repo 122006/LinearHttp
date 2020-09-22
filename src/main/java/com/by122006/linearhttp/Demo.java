@@ -23,7 +23,7 @@ public class Demo {
 
 
 @HttpRpc
-abstract class HttpTest {
+interface HttpTest {
     static String getUrl(){
         return "http://10.1.44.122:8080/sz/ads-admin";
     }

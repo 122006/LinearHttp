@@ -183,7 +183,7 @@ public class ResultBody<R, M> {
         String name;
         public <T extends Annotation> T getAnnotation(Class<T> tClass){
             for (Annotation annotation:annotations){
-                if (annotation.getClass()==tClass){
+                if (annotation.annotationType()==tClass){
                     return (T) annotation;
                 }
             }
