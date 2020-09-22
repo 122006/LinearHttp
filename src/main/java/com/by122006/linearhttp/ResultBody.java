@@ -6,14 +6,13 @@ import com.by122006.linearhttp.analyse.param.Param;
 import com.by122006.linearhttp.analyse.request.RequestHandler;
 import com.by122006.linearhttp.analyse.request.ResultBox;
 import com.by122006.linearhttp.analyse.result.ResultAnalyse;
-import com.by122006.linearhttp.annotations.Get;
-import com.by122006.linearhttp.annotations.HttpRpc;
-import com.by122006.linearhttp.annotations.Post;
-import com.by122006.linearhttp.exceptions.FailException;
-import com.by122006.linearhttp.utils.StringUtil;
+import com.by122006.linearhttp.annotations.*;
+import com.by122006.linearhttp.exceptions.*;
+import com.by122006.linearhttp.utils.*;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
@@ -94,8 +93,7 @@ public class ResultBody<R, M> {
                         : post.path() + "/";
                 url=formatUrl(url);
                 String[] headers = post.headers().length == 0 ? classAnnotation.headers() : post.headers();
-
-                Parameter[] parameters = method.getParameters();
+                Parameter[] parameters = getParameters(method);
                 if (parameters.length != args.length)
                     throw new RuntimeException(String.format("传入参数%d与方法入参数%d不一致", args.length, parameters.length));
                 String str;
@@ -132,7 +130,7 @@ public class ResultBody<R, M> {
                 url=formatUrl(url);
                 String[] headers = get.headers().length == 0 ? classAnnotation.headers() : get.headers();
 
-                Parameter[] parameters = method.getParameters();
+                Parameter[] parameters = getParameters(method);
                 if (parameters.length != args.length)
                     throw new RuntimeException(String.format("传入参数%d与方法入参数%d不一致", args.length, parameters.length));
 
@@ -163,6 +161,38 @@ public class ResultBody<R, M> {
                 return resultAnalyse.analyse(resultBox.getResult(), returnType);
         });
         m = requestClass.cast(o);
+    }
+
+    private Parameter[] getParameters(Method method) {
+        //java7没有getParameters方法
+        int parameterCount = method.getParameterCount();
+        Parameter[] parameters=new Parameter[parameterCount];
+        Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for(int i = 0; i< parameterCount; i++){
+            parameters[i]=new Parameter();
+            parameters[i].annotations= parameterAnnotations[i];
+            parameters[i].type= parameterTypes[i];
+            parameters[i].name= "arg"+i;
+        }
+        return parameters;
+    }
+
+    public static class Parameter{
+        Annotation[] annotations;
+        Class<?> type;
+        String name;
+        public <T extends Annotation> T getAnnotation(Class<T> tClass){
+            for (Annotation annotation:annotations){
+                if (annotation.getClass()==tClass){
+                    return (T) annotation;
+                }
+            }
+            return null;
+        }
+        public String getName(){
+            return name;
+        }
     }
 
 

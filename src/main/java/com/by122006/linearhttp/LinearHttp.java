@@ -32,7 +32,7 @@ public class LinearHttp<M> {
     }
 
     /**
-     * 需要返回值的方法引用，否则使用 {@see com.by122006.linearhttp.LinearHttp#action}
+     * 需要返回值的方法引用，否则使用 {@link LinearHttp#action}
      *
      * @param re
      * @param <R>

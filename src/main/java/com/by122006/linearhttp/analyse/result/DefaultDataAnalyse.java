@@ -3,7 +3,7 @@ package com.by122006.linearhttp.analyse.result;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.by122006.linearhttp.exceptions.FailException;
+import com.by122006.linearhttp.exceptions.*;
 
 import java.lang.reflect.Array;
 import java.util.List;

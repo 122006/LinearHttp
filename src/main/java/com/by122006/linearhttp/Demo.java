@@ -2,9 +2,7 @@ package com.by122006.linearhttp;
 
 import com.alibaba.fastjson.JSONObject;
 import com.by122006.linearhttp.analyse.param.Param;
-import com.by122006.linearhttp.annotations.Get;
-import com.by122006.linearhttp.annotations.HttpRpc;
-import com.by122006.linearhttp.annotations.Post;
+import com.by122006.linearhttp.annotations.*;
 
 public class Demo {
     public static void main(String[] args) {

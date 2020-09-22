@@ -1,6 +1,6 @@
 package com.by122006.linearhttp.analyse.result;
 
-import com.by122006.linearhttp.exceptions.FailException;
+import com.by122006.linearhttp.exceptions.*;
 
 public interface ResultAnalyse {
     public void codeCheck(Integer a, String result) throws FailException;
