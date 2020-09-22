@@ -1,10 +1,9 @@
-package com.by122006.annotations;
+package com.by122006.linearhttp.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.List;
 
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,4 +1,4 @@
-package com.by122006.annotations;
+package com.by122006.linearhttp.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,16 +1,16 @@
-package com.by122006;
+package com.by122006.linearhttp;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.by122006.analyse.param.Param;
-import com.by122006.analyse.request.RequestHandler;
-import com.by122006.analyse.request.ResultBox;
-import com.by122006.analyse.result.ResultAnalyse;
-import com.by122006.annotations.Get;
-import com.by122006.annotations.HttpRpc;
-import com.by122006.annotations.Post;
-import com.by122006.exceptions.FailException;
-import com.by122006.utils.StringUtil;
+import com.by122006.linearhttp.analyse.param.Param;
+import com.by122006.linearhttp.analyse.request.RequestHandler;
+import com.by122006.linearhttp.analyse.request.ResultBox;
+import com.by122006.linearhttp.analyse.result.ResultAnalyse;
+import com.by122006.linearhttp.annotations.Get;
+import com.by122006.linearhttp.annotations.HttpRpc;
+import com.by122006.linearhttp.annotations.Post;
+import com.by122006.linearhttp.exceptions.FailException;
+import com.by122006.linearhttp.utils.StringUtil;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 

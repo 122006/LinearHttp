@@ -1,4 +1,4 @@
-package com.by122006.exceptions;
+package com.by122006.linearhttp.exceptions;
 
 public class FailException extends RuntimeException {
 

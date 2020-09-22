@@ -1,4 +1,4 @@
-package com.by122006.analyse.param;
+package com.by122006.linearhttp.analyse.param;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

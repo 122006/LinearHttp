@@ -1,4 +1,4 @@
-package com.by122006.utils;
+package com.by122006.linearhttp.utils;
 
 public class StringUtil {
     /**

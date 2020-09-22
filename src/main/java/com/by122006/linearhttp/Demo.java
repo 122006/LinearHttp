@@ -1,13 +1,10 @@
-package com.by122006;
+package com.by122006.linearhttp;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.by122006.analyse.param.Param;
-import com.by122006.annotations.Get;
-import com.by122006.annotations.HttpRpc;
-import com.by122006.annotations.Post;
-
-import java.util.List;
+import com.by122006.linearhttp.analyse.param.Param;
+import com.by122006.linearhttp.annotations.Get;
+import com.by122006.linearhttp.annotations.HttpRpc;
+import com.by122006.linearhttp.annotations.Post;
 
 public class Demo {
     public static void main(String[] args) {

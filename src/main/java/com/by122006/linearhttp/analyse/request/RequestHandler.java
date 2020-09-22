@@ -1,4 +1,4 @@
-package com.by122006.analyse.request;
+package com.by122006.linearhttp.analyse.request;
 
 public interface RequestHandler {
 

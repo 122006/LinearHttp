@@ -1,9 +1,9 @@
-package com.by122006.annotations;
+package com.by122006.linearhttp.annotations;
 
-import com.by122006.analyse.request.HUCHandler;
-import com.by122006.analyse.request.RequestHandler;
-import com.by122006.analyse.result.DefaultDataAnalyse;
-import com.by122006.analyse.result.ResultAnalyse;
+import com.by122006.linearhttp.analyse.request.HUCHandler;
+import com.by122006.linearhttp.analyse.request.RequestHandler;
+import com.by122006.linearhttp.analyse.result.DefaultDataAnalyse;
+import com.by122006.linearhttp.analyse.result.ResultAnalyse;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
