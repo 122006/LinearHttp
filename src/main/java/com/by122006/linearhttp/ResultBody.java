@@ -80,9 +80,9 @@ public class ResultBody<R, M> {
         }
         String finalClassUrl = classUrl;
         Object o = Proxy.newProxyInstance(requestClass.getClassLoader(), new Class[]{requestClass}, (proxy, method, args) -> {
-            if (method.isDefault()) return method.invoke(args);
             Post post = method.getAnnotation(Post.class);
             Get get = method.getAnnotation(Get.class);
+            if (post==null&&get==null) return method.invoke(proxy);
             String requestName = method.getName();
             ResultBox resultBox;
 
