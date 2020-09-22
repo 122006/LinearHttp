@@ -36,7 +36,7 @@ public class DefaultDataAnalyse implements ResultAnalyse {
             throw new FailException(errorCode, msg);
         }
         Object data = jsonObject.get("result");
-        Class clazz=t instanceof Class? (Class) t : ((ParameterizedTypeImpl) t).getRawType();
+        Class clazz=t instanceof Class? (Class) t : (Class) ((ParameterizedType) t).getRawType();
         if (data == null) {
             return null;
         } else if (data.getClass() == t) {
@@ -48,7 +48,7 @@ public class DefaultDataAnalyse implements ResultAnalyse {
         } else if (clazz.isAssignableFrom(Map.class)) {
             return (T) JSON.parseObject(String.valueOf(data));
         } else if (clazz.isAssignableFrom(List.class)) {
-            Type[] pt = ((ParameterizedTypeImpl) t).getActualTypeArguments();
+            Type[] pt = ((ParameterizedType) t).getActualTypeArguments();
             if (pt.length==0) return (T) JSON.parseArray(String.valueOf(data));
             return (T) JSON.parseArray(String.valueOf(data), (Class) pt[0]);
         } else if (clazz.isArray()) {
