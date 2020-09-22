@@ -157,7 +157,7 @@ public class ResultBody<R, M> {
             if (returnType == void.class || returnType == Void.class) {
                 return null;
             } else
-                return resultAnalyse.analyse(resultBox.getResult(), returnType);
+                return resultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
         });
         m = requestClass.cast(o);
     }

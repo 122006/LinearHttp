@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.by122006.linearhttp.exceptions.*;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +28,7 @@ public class DefaultDataAnalyse implements ResultAnalyse {
     }
 
     @Override
-    public <T> T analyse(String object, Class<T> t) throws FailException {
+    public <T> T analyse(String object, Type t) throws FailException {
         JSONObject jsonObject = JSONObject.parseObject(object);
         int errorCode = jsonObject.getIntValue("code");
         String msg = jsonObject.getString("msg");
@@ -33,23 +36,26 @@ public class DefaultDataAnalyse implements ResultAnalyse {
             throw new FailException(errorCode, msg);
         }
         Object data = jsonObject.get("result");
+        Class clazz=t instanceof Class? (Class) t : ((ParameterizedTypeImpl) t).getRawType();
         if (data == null) {
             return null;
         } else if (data.getClass() == t) {
             return (T) data;
-        } else if (data.getClass().isAssignableFrom(t)) {
+        } else if (data.getClass().isAssignableFrom(clazz)) {
             return (T) data;
-        } else if (t.isAssignableFrom(String.class)) {
+        } else if (clazz.isAssignableFrom(String.class)) {
             return (T) String.valueOf(data);
-        } else if (t.isAssignableFrom(Map.class)) {
+        } else if (clazz.isAssignableFrom(Map.class)) {
             return (T) JSON.parseObject(String.valueOf(data));
-        } else if (t.isAssignableFrom(List.class)) {
-            return (T) JSON.parseArray(String.valueOf(data));
-        } else if (t.isArray()) {
+        } else if (clazz.isAssignableFrom(List.class)) {
+            Type[] pt = ((ParameterizedTypeImpl) t).getActualTypeArguments();
+            if (pt.length==0) return (T) JSON.parseArray(String.valueOf(data));
+            return (T) JSON.parseArray(String.valueOf(data), (Class) pt[0]);
+        } else if (clazz.isArray()) {
             if (data instanceof String)
-                return (T) JSONArray.parseArray((String) data).toArray(getArray(t.getComponentType(),0));
+                return (T) JSONArray.parseArray((String) data).toArray(getArray(clazz.getComponentType(),0));
             else if (data instanceof JSONArray)
-                return (T) ((JSONArray)data).toArray(getArray(t.getComponentType(),0));
+                return (T) ((JSONArray)data).toArray(getArray(clazz.getComponentType(),0));
         } else {
             return JSONObject.parseObject(String.valueOf(data), t);
         }
