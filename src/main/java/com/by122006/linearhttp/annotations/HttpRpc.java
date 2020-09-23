@@ -1,9 +1,11 @@
 package com.by122006.linearhttp.annotations;
 
+import com.by122006.linearhttp.analyse.param.DefaultParamsAnalyse;
 import com.by122006.linearhttp.analyse.request.HUCHandler;
-import com.by122006.linearhttp.analyse.request.RequestHandler;
+import com.by122006.linearhttp.interfaces.IParamsAnalyse;
+import com.by122006.linearhttp.interfaces.IRequestHandler;
 import com.by122006.linearhttp.analyse.result.DefaultDataAnalyse;
-import com.by122006.linearhttp.analyse.result.ResultAnalyse;
+import com.by122006.linearhttp.interfaces.IResultAnalyse;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -16,11 +18,16 @@ public @interface HttpRpc {
     /**
      * 返回值解析类
      */
-    Class<? extends ResultAnalyse> dataAnalyse() default DefaultDataAnalyse.class;
+    Class<? extends IResultAnalyse> dataAnalyse() default DefaultDataAnalyse.class;
     /**
      * 网络请求实现类
      */
-    Class<? extends RequestHandler> requestHandler() default HUCHandler.class;
+    Class<? extends IRequestHandler> requestHandler() default HUCHandler.class;
+    /**
+     * 网络请求实现类
+     */
+    Class<? extends IParamsAnalyse> paramsAnalyse() default DefaultParamsAnalyse.class;
+
     /**
      * url 包含端口号
      */

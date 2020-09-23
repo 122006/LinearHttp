@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.by122006.linearhttp.exceptions.*;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import com.by122006.linearhttp.interfaces.IResultAnalyse;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
@@ -12,7 +12,22 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultDataAnalyse implements ResultAnalyse {
+public class DefaultDataAnalyse implements IResultAnalyse {
+
+
+    public String getMsg(JSONObject jsonObject){
+        return jsonObject.getString("msg");
+    }
+    public Object getResult(JSONObject jsonObject){
+        return jsonObject.get("result");
+    }
+
+    public void verifyCode(JSONObject jsonObject) throws FailException{
+        int errorCode=jsonObject.getIntValue("code");
+        if (errorCode != 0 && errorCode != 200) {
+            throw new FailException(errorCode, getMsg(jsonObject));
+        }
+    }
 
 
     @Override
@@ -20,7 +35,7 @@ public class DefaultDataAnalyse implements ResultAnalyse {
         String msg = null;
         try {
             JSONObject jsonObject = JSONObject.parseObject(result);
-            msg = jsonObject.getString("msg");
+            msg = getMsg(jsonObject);
         } catch (Exception e) {
             msg = result;
         }
@@ -30,12 +45,8 @@ public class DefaultDataAnalyse implements ResultAnalyse {
     @Override
     public <T> T analyse(String object, Type t) throws FailException {
         JSONObject jsonObject = JSONObject.parseObject(object);
-        int errorCode = jsonObject.getIntValue("code");
-        String msg = jsonObject.getString("msg");
-        if (errorCode != 0 && errorCode != 200) {
-            throw new FailException(errorCode, msg);
-        }
-        Object data = jsonObject.get("result");
+        verifyCode(jsonObject);
+        Object data = getResult(jsonObject);
         Class clazz=t instanceof Class? (Class) t : (Class) ((ParameterizedType) t).getRawType();
         if (data == null) {
             return null;

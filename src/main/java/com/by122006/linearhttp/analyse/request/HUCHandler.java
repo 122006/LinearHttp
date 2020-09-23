@@ -1,13 +1,15 @@
 package com.by122006.linearhttp.analyse.request;
 
 
+import com.by122006.linearhttp.interfaces.IRequestHandler;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class HUCHandler implements RequestHandler {
+public class HUCHandler implements IRequestHandler {
     @Override
     public ResultBox post(String[] headers,String url,String content) throws Exception{
         URL oUrl = new URL(url);

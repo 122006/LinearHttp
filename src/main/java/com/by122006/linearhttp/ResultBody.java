@@ -2,10 +2,11 @@ package com.by122006.linearhttp;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.by122006.linearhttp.analyse.param.Param;
-import com.by122006.linearhttp.analyse.request.RequestHandler;
+import com.by122006.linearhttp.annotations.Param;
+import com.by122006.linearhttp.interfaces.IParamsAnalyse;
+import com.by122006.linearhttp.interfaces.IRequestHandler;
 import com.by122006.linearhttp.analyse.request.ResultBox;
-import com.by122006.linearhttp.analyse.result.ResultAnalyse;
+import com.by122006.linearhttp.interfaces.IResultAnalyse;
 import com.by122006.linearhttp.annotations.*;
 import com.by122006.linearhttp.exceptions.*;
 import com.by122006.linearhttp.utils.*;
@@ -14,7 +15,6 @@ import lombok.experimental.Accessors;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
@@ -26,11 +26,13 @@ public class ResultBody<R, M> {
     Class<M> requestClass;
     M m;
 
-    private static final HashMap<Class<? extends ResultAnalyse>, ResultAnalyse> resultAnalyseMap = new HashMap<>();
-    private static final HashMap<Class<? extends RequestHandler>, RequestHandler> requestHandlerHashMap = new HashMap<>();
+    private static final HashMap<Class<? extends IResultAnalyse>, IResultAnalyse> resultAnalyseMap = new HashMap<>();
+    private static final HashMap<Class<? extends IRequestHandler>, IRequestHandler> requestHandlerHashMap = new HashMap<>();
+    private static final HashMap<Class<? extends IParamsAnalyse>, IParamsAnalyse> paramsAnalyseHashMap = new HashMap<>();
 
-    ResultAnalyse resultAnalyse;
-    RequestHandler requestHandler;
+    IResultAnalyse IResultAnalyse;
+    IRequestHandler IRequestHandler;
+    IParamsAnalyse IParamsAnalyse;
 
     public ResultBody(LinearHttp<M> linearHttp, LinearHttp.Function<R, M> result) {
         this.linearHttp = linearHttp;
@@ -42,10 +44,10 @@ public class ResultBody<R, M> {
     private void action() {
         HttpRpc classAnnotation = requestClass.getAnnotation(HttpRpc.class);
 
-        if ((resultAnalyse = resultAnalyseMap.get(classAnnotation.dataAnalyse())) == null) {
+        if ((IResultAnalyse = resultAnalyseMap.get(classAnnotation.dataAnalyse())) == null) {
             try {
-                resultAnalyse = classAnnotation.dataAnalyse().newInstance();
-                resultAnalyseMap.put(classAnnotation.dataAnalyse(), resultAnalyse);
+                IResultAnalyse = classAnnotation.dataAnalyse().newInstance();
+                resultAnalyseMap.put(classAnnotation.dataAnalyse(), IResultAnalyse);
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -56,10 +58,24 @@ public class ResultBody<R, M> {
                 return;
             }
         }
-        if ((requestHandler = requestHandlerHashMap.get(classAnnotation.requestHandler())) == null) {
+        if ((IRequestHandler = requestHandlerHashMap.get(classAnnotation.requestHandler())) == null) {
             try {
-                requestHandler = classAnnotation.requestHandler().newInstance();
-                requestHandlerHashMap.put(classAnnotation.requestHandler(), requestHandler);
+                IRequestHandler = classAnnotation.requestHandler().newInstance();
+                requestHandlerHashMap.put(classAnnotation.requestHandler(), IRequestHandler);
+            } catch (Exception e) {
+                e.printStackTrace();
+                try {
+                    errorCallBack.action(e);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+                return;
+            }
+        }
+        if ((IParamsAnalyse = paramsAnalyseHashMap.get(classAnnotation.requestHandler())) == null) {
+            try {
+                IParamsAnalyse = classAnnotation.paramsAnalyse().newInstance();
+                paramsAnalyseHashMap.put(classAnnotation.paramsAnalyse(), IParamsAnalyse);
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -74,143 +90,98 @@ public class ResultBody<R, M> {
         try {
             Method getUrl = requestClass.getMethod("getUrl");
             getUrl.setAccessible(true);
-            classUrl= (String) getUrl.invoke(null);
+            classUrl = (String) getUrl.invoke(null);
         } catch (Throwable e) {
-            classUrl=classAnnotation.url();
+            classUrl = classAnnotation.url();
         }
         String finalClassUrl = classUrl;
         Object o = Proxy.newProxyInstance(requestClass.getClassLoader(), new Class[]{requestClass}, (proxy, method, args) -> {
             Post post = method.getAnnotation(Post.class);
             Get get = method.getAnnotation(Get.class);
-            if (post==null&&get==null) return method.invoke(proxy);
+            if (post == null && get == null) return method.invoke(proxy);
             String requestName = method.getName();
             ResultBox resultBox;
 
+            Parameter[] parameters = getParameters(method, args);
             if (post != null) {
-                String url = StringUtil.isEmpty(post.path())
-                        ? finalClassUrl + "/" + post.prePath() + "/" + requestName + "/"
-                        : post.path() + "/";
-                url=formatUrl(url);
-                String[] headers = post.headers().length == 0 ? classAnnotation.headers() : post.headers();
-                Parameter[] parameters = getParameters(method);
-                if (parameters.length != args.length)
-                    throw new RuntimeException(String.format("传入参数%d与方法入参数%d不一致", args.length, parameters.length));
-                String str;
-                if (args.length == 1) {
-                    Param annotation = parameters[0].getAnnotation(Param.class);
-                    String name = annotation != null && !StringUtil.isEmpty(annotation.value())
-                            ? annotation.value()
-                            : parameters[0].getName();
-                    if (annotation != null && annotation.unBox()) {
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put(name, args);
-                        str = jsonObject.toJSONString();
-                    } else {
-                        str = JSON.toJSONString(args[0]);
-                    }
-                } else {
-                    //多参数一定是拆分
-                    JSONObject jsonObject = new JSONObject();
-                    for (int i = 0; i < args.length; i++) {
-                        Param annotation = parameters[i].getAnnotation(Param.class);
-                        String name = annotation != null && !StringUtil.isEmpty(annotation.value())
-                                ? annotation.value()
-                                : parameters[i].getName();
-                        jsonObject.put(name, args[i]);
-                    }
-                    str = jsonObject.toJSONString();
-
-                }
-                resultBox = requestHandler.post(headers, url, str);
+                String url = finalClassUrl+"/" + (StringUtil.isEmpty(post.path())
+                        ?post.prePath() + "/" + requestName + "/"
+                        : post.path() + "/");
+                url = formatUrl(url);
+                resultBox=IParamsAnalyse.post(url,classAnnotation,method,post,parameters,IRequestHandler);
             } else if (get != null) {
-                String url = StringUtil.isEmpty(get.path())
-                        ? finalClassUrl + "/" + get.prePath() + "/" + requestName + "/"
-                        : get.path() + "/";
-                url=formatUrl(url);
-                String[] headers = get.headers().length == 0 ? classAnnotation.headers() : get.headers();
-
-                Parameter[] parameters = getParameters(method);
-                if (parameters.length != args.length)
-                    throw new RuntimeException(String.format("传入参数%d与方法入参数%d不一致", args.length, parameters.length));
-
-                StringBuilder str = new StringBuilder();
-                if (!url.contains("?")){
-                    url+="?";
-                }
-                for (int i = 0; i < args.length; i++) {
-                    Param annotation = parameters[i].getAnnotation(Param.class);
-                    String name = annotation != null && !StringUtil.isEmpty(annotation.value())
-                            ? annotation.value()
-                            : parameters[i].getName();
-                    str.append(name)
-                            .append("=")
-                            .append(args[i]);
-                    if (i != args.length - 1) str.append("&");
-                }
-                resultBox = requestHandler.get(headers, url  + str);
-            } else {
-                throw new RuntimeException("没有定义Get或Post注解");
-            }
+                String url = finalClassUrl+"/" + (StringUtil.isEmpty(get.path())
+                        ? get.prePath() + "/" + requestName + "/"
+                        : get.path() + "/");
+                url = formatUrl(url);
+                resultBox = IParamsAnalyse.get(url,classAnnotation,method,get,parameters,IRequestHandler);
+            }else throw new RuntimeException("unknow request method");
             int httpCode = resultBox.getHttpCode();
-            resultAnalyse.codeCheck(httpCode,resultBox.getResult());
+            IResultAnalyse.codeCheck(httpCode, resultBox.getResult());
             Class<?> returnType = method.getReturnType();
             if (returnType == void.class || returnType == Void.class) {
                 return null;
             } else
-                return resultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
+                return IResultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
         });
         m = requestClass.cast(o);
     }
 
-    private Parameter[] getParameters(Method method) {
+    private Parameter[] getParameters(Method method, Object[] args) {
         //java7没有getParameters方法
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         int parameterCount = parameterAnnotations.length;
-        Parameter[] parameters=new Parameter[parameterCount];
+        Parameter[] parameters = new Parameter[parameterCount];
         Class<?>[] parameterTypes = method.getParameterTypes();
-        for(int i = 0; i< parameterCount; i++){
-            parameters[i]=new Parameter();
-            parameters[i].annotations= parameterAnnotations[i];
-            parameters[i].type= parameterTypes[i];
-            parameters[i].name= "arg"+i;
+        if (parameters.length != args.length)
+            throw new RuntimeException(String.format("传入参数%d与方法入参数%d不一致", args.length, parameters.length));
+        for (int i = 0; i < parameterCount; i++) {
+            parameters[i] = new Parameter();
+            parameters[i].annotations = parameterAnnotations[i];
+            parameters[i].type = parameterTypes[i];
+            parameters[i].name = parameters[i].getAnnotation(Param.class).value();
+            parameters[i].value = args[i];
         }
         return parameters;
     }
 
-    public static class Parameter{
-        Annotation[] annotations;
-        Class<?> type;
-        String name;
-        public <T extends Annotation> T getAnnotation(Class<T> tClass){
-            for (Annotation annotation:annotations){
-                if (annotation.annotationType()==tClass){
+    public static class Parameter {
+        public Annotation[] annotations;
+        public Class<?> type;
+        public String name;
+        public Object value;
+
+        public <T extends Annotation> T getAnnotation(Class<T> tClass) {
+            for (Annotation annotation : annotations) {
+                if (annotation.annotationType() == tClass) {
                     return (T) annotation;
                 }
             }
             return null;
         }
-        public String getName(){
+
+        public String getName() {
             return name;
         }
     }
 
 
-    public String formatUrl(String oUrl){
-        String end="";
-        if (oUrl.contains("?")) end=oUrl.substring(oUrl.indexOf("?"));
-        int index=oUrl.indexOf("//");
-        String head="";
-        if (index!=-1){
-            head=oUrl.substring(0,index);
-            oUrl=oUrl.substring(index+2);
-        }else {
-            head="http:";
+    public String formatUrl(String oUrl) {
+        String end = "";
+        if (oUrl.contains("?")) end = oUrl.substring(oUrl.indexOf("?"));
+        int index = oUrl.indexOf("//");
+        String head = "";
+        if (index != -1) {
+            head = oUrl.substring(0, index);
+            oUrl = oUrl.substring(index + 2);
+        } else {
+            head = "http:";
         }
         while (oUrl.contains("//")) {
             oUrl = oUrl.replace("//", "/");
         }
-        if (oUrl.endsWith("/")) oUrl=oUrl.substring(0,oUrl.length()-1);
-        return head+"//"+oUrl+end;
+        if (oUrl.endsWith("/")) oUrl = oUrl.substring(0, oUrl.length() - 1);
+        return head + "//" + oUrl + end;
     }
 
     private void error(Throwable e) {
