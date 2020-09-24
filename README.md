@@ -7,7 +7,7 @@
 * 实例 [Demo文件及逐行解析->Demo.java](src\main\java\com\by122006\linearhttp\Demo.java)
 
     > 进行网络请求
-                                                                                  >
+                                                                                  
          public class Demo {
              public static void main(String[] args) {
                  LinearHttp.create(HttpTest.class)
