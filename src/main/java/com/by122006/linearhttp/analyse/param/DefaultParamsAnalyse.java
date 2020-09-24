@@ -31,7 +31,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
 
         }
         String[] headers = get.headers().length == 0 ? httpRPC.headers() : get.headers();
-        return iRequestHandler.post(headers, url, str.toString());
+        return iRequestHandler.get(headers, url+ str.toString());
     }
 
     @Override
