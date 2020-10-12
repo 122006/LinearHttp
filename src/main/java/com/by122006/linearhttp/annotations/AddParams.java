@@ -8,8 +8,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AddParams {
+
     /**
      * 其他可选常量，作为参数添加
      */
-    public String[] addParams() default {};
+    public String[] value() default {};
 }
