@@ -17,7 +17,7 @@ public class DefaultParamsHandler implements IParamsHandler {
     @Override
     public ResultBody.Parameter[] handler(Method method, ResultBody.Parameter[] parameters) throws Exception {
         AddParams addParams = method.getAnnotation(AddParams.class);
-        String[] strings = addParams.addParams();
+        String[] strings = addParams.value();
         if (strings.length > 0) {
             ResultBody.Parameter[] adds = handle(strings);
             return ArraysUtil.concat(parameters, adds);
