@@ -13,5 +13,4 @@ public interface IParamsHandler {
     public ResultBody.Parameter[] handler(Method method, ResultBody.Parameter[] parameters) throws Exception;
 
 
-    public HashMap<String, LinearHttp.ResultAction<?>> addParams() throws Exception;
 }
