@@ -63,10 +63,14 @@ public class DefaultDataAnalyse implements IResultAnalyse {
             if (pt.length==0) return (T) JSON.parseArray(String.valueOf(data));
             return (T) JSON.parseArray(String.valueOf(data), (Class) pt[0]);
         } else if (clazz.isArray()) {
-            if (data instanceof String)
-                return (T) JSONArray.parseArray((String) data).toArray(getArray(clazz.getComponentType(),0));
-            else if (data instanceof JSONArray)
-                return (T) ((JSONArray)data).toArray(getArray(clazz.getComponentType(),0));
+            Class componentType = clazz.getComponentType();
+            if (data instanceof String) {
+                List list = JSONArray.parseArray((String) data, componentType);
+                return (T) list.toArray(getArray(componentType,0));
+            } else if (data instanceof JSONArray) {
+                List list = JSONArray.parseArray(((JSONArray) data).toJSONString(), componentType);
+                return (T) list.toArray(getArray(componentType,0));
+            }
         } else {
             return JSONObject.parseObject(String.valueOf(data), t);
         }

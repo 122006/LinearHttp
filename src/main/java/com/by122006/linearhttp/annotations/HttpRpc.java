@@ -1,8 +1,10 @@
 package com.by122006.linearhttp.annotations;
 
 import com.by122006.linearhttp.analyse.param.DefaultParamsAnalyse;
+import com.by122006.linearhttp.analyse.param.DefaultParamsHandler;
 import com.by122006.linearhttp.analyse.request.HUCHandler;
 import com.by122006.linearhttp.interfaces.IParamsAnalyse;
+import com.by122006.linearhttp.interfaces.IParamsHandler;
 import com.by122006.linearhttp.interfaces.IRequestHandler;
 import com.by122006.linearhttp.analyse.result.DefaultDataAnalyse;
 import com.by122006.linearhttp.interfaces.IResultAnalyse;
@@ -27,7 +29,10 @@ public @interface HttpRpc {
      * 网络请求实现类
      */
     Class<? extends IParamsAnalyse> paramsAnalyse() default DefaultParamsAnalyse.class;
-
+    /**
+     * 网络请求常量类
+     */
+    Class<? extends IParamsHandler> paramsHandler() default DefaultParamsHandler.class;
     /**
      * url 包含端口号
      */

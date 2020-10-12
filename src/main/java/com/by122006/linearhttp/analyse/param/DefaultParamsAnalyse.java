@@ -8,8 +8,8 @@ import com.by122006.linearhttp.annotations.Get;
 import com.by122006.linearhttp.annotations.HttpRpc;
 import com.by122006.linearhttp.annotations.Param;
 import com.by122006.linearhttp.annotations.Post;
-import com.by122006.linearhttp.exceptions.FailException;
 import com.by122006.linearhttp.interfaces.IParamsAnalyse;
+import com.by122006.linearhttp.interfaces.IParamsHandler;
 import com.by122006.linearhttp.interfaces.IRequestHandler;
 
 import java.lang.reflect.Method;
@@ -17,19 +17,20 @@ import java.lang.reflect.Method;
 public class DefaultParamsAnalyse implements IParamsAnalyse {
 
     @Override
-    public ResultBox get(String url,HttpRpc httpRPC, Method method, Get get, ResultBody.Parameter[] parameters, IRequestHandler iRequestHandler) throws Exception {
+    public ResultBox get(String url, HttpRpc httpRPC, Method method, Get get, ResultBody.Parameter[] parameters, IRequestHandler iRequestHandler) throws Exception {
         StringBuilder str = new StringBuilder();
         if (!url.contains("?")) {
             url += "?";
         }
+
         for (int i = 0; i < parameters.length; i++) {
             String name = parameters[i].name;
             str.append(name)
                     .append("=")
                     .append(parameters[i].value);
             if (i != parameters.length - 1) str.append("&");
-
         }
+
         String[] headers = get.headers().length == 0 ? httpRPC.headers() : get.headers();
         return iRequestHandler.get(headers, url+ str.toString());
     }
@@ -58,4 +59,8 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
         String[] headers = post.headers().length == 0 ? httpRPC.headers() : post.headers();
         return iRequestHandler.post(headers, url, str);
     }
+
+
+
+
 }

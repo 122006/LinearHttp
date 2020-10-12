@@ -1,9 +1,8 @@
 package com.by122006.linearhttp;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.by122006.linearhttp.annotations.Param;
 import com.by122006.linearhttp.interfaces.IParamsAnalyse;
+import com.by122006.linearhttp.interfaces.IParamsHandler;
 import com.by122006.linearhttp.interfaces.IRequestHandler;
 import com.by122006.linearhttp.analyse.request.ResultBox;
 import com.by122006.linearhttp.interfaces.IResultAnalyse;
@@ -29,10 +28,12 @@ public class ResultBody<R, M> {
     private static final HashMap<Class<? extends IResultAnalyse>, IResultAnalyse> resultAnalyseMap = new HashMap<>();
     private static final HashMap<Class<? extends IRequestHandler>, IRequestHandler> requestHandlerHashMap = new HashMap<>();
     private static final HashMap<Class<? extends IParamsAnalyse>, IParamsAnalyse> paramsAnalyseHashMap = new HashMap<>();
+    private static final HashMap<Class<? extends IParamsHandler>, IParamsHandler> paramsHandlerHashMap = new HashMap<>();
 
-    IResultAnalyse IResultAnalyse;
-    IRequestHandler IRequestHandler;
-    IParamsAnalyse IParamsAnalyse;
+    IResultAnalyse iResultAnalyse;
+    IRequestHandler iRequestHandler;
+    IParamsAnalyse iParamsAnalyse;
+    IParamsHandler iParamsHandler;
 
     public ResultBody(LinearHttp<M> linearHttp, LinearHttp.Function<R, M> result) {
         this.linearHttp = linearHttp;
@@ -44,10 +45,10 @@ public class ResultBody<R, M> {
     private void action() {
         HttpRpc classAnnotation = requestClass.getAnnotation(HttpRpc.class);
 
-        if ((IResultAnalyse = resultAnalyseMap.get(classAnnotation.dataAnalyse())) == null) {
+        if ((iResultAnalyse = resultAnalyseMap.get(classAnnotation.dataAnalyse())) == null) {
             try {
-                IResultAnalyse = classAnnotation.dataAnalyse().newInstance();
-                resultAnalyseMap.put(classAnnotation.dataAnalyse(), IResultAnalyse);
+                iResultAnalyse = classAnnotation.dataAnalyse().newInstance();
+                resultAnalyseMap.put(classAnnotation.dataAnalyse(), iResultAnalyse);
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -58,10 +59,10 @@ public class ResultBody<R, M> {
                 return;
             }
         }
-        if ((IRequestHandler = requestHandlerHashMap.get(classAnnotation.requestHandler())) == null) {
+        if ((iRequestHandler = requestHandlerHashMap.get(classAnnotation.requestHandler())) == null) {
             try {
-                IRequestHandler = classAnnotation.requestHandler().newInstance();
-                requestHandlerHashMap.put(classAnnotation.requestHandler(), IRequestHandler);
+                iRequestHandler = classAnnotation.requestHandler().newInstance();
+                requestHandlerHashMap.put(classAnnotation.requestHandler(), iRequestHandler);
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -72,10 +73,24 @@ public class ResultBody<R, M> {
                 return;
             }
         }
-        if ((IParamsAnalyse = paramsAnalyseHashMap.get(classAnnotation.requestHandler())) == null) {
+        if ((iParamsAnalyse = paramsAnalyseHashMap.get(classAnnotation.requestHandler())) == null) {
             try {
-                IParamsAnalyse = classAnnotation.paramsAnalyse().newInstance();
-                paramsAnalyseHashMap.put(classAnnotation.paramsAnalyse(), IParamsAnalyse);
+                iParamsAnalyse = classAnnotation.paramsAnalyse().newInstance();
+                paramsAnalyseHashMap.put(classAnnotation.paramsAnalyse(), iParamsAnalyse);
+            } catch (Exception e) {
+                e.printStackTrace();
+                try {
+                    errorCallBack.action(e);
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
+                return;
+            }
+        }
+        if ((iParamsHandler = paramsHandlerHashMap.get(classAnnotation.requestHandler())) == null) {
+            try {
+                iParamsHandler = classAnnotation.paramsHandler().newInstance();
+                paramsHandlerHashMap.put(classAnnotation.paramsHandler(), iParamsHandler);
             } catch (Exception e) {
                 e.printStackTrace();
                 try {
@@ -103,26 +118,27 @@ public class ResultBody<R, M> {
             ResultBox resultBox;
 
             Parameter[] parameters = getParameters(method, args);
+            parameters=iParamsHandler.handler(method,parameters);
             if (post != null) {
                 String url = finalClassUrl+"/" + (StringUtil.isEmpty(post.path())
                         ?post.prePath() + "/" + requestName + "/"
                         : post.path() + "/");
                 url = formatUrl(url);
-                resultBox=IParamsAnalyse.post(url,classAnnotation,method,post,parameters,IRequestHandler);
+                resultBox= iParamsAnalyse.post(url,classAnnotation,method,post,parameters, iRequestHandler);
             } else if (get != null) {
                 String url = finalClassUrl+"/" + (StringUtil.isEmpty(get.path())
                         ? get.prePath() + "/" + requestName + "/"
                         : get.path() + "/");
                 url = formatUrl(url);
-                resultBox = IParamsAnalyse.get(url,classAnnotation,method,get,parameters,IRequestHandler);
+                resultBox = iParamsAnalyse.get(url,classAnnotation,method,get,parameters, iRequestHandler);
             }else throw new RuntimeException("unknow request method");
             int httpCode = resultBox.getHttpCode();
-            IResultAnalyse.codeCheck(httpCode, resultBox.getResult());
+            iResultAnalyse.codeCheck(httpCode, resultBox.getResult());
             Class<?> returnType = method.getReturnType();
             if (returnType == void.class || returnType == Void.class) {
                 return null;
             } else
-                return IResultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
+                return iResultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
         });
         m = requestClass.cast(o);
     }
@@ -142,6 +158,7 @@ public class ResultBody<R, M> {
             parameters[i].name = parameters[i].getAnnotation(Param.class).value();
             parameters[i].value = args[i];
         }
+
         return parameters;
     }
 
