@@ -67,6 +67,11 @@ public class DefaultParamsHandler implements IParamsHandler {
             public boolean unBox() {
                 return false;
             }
+
+            @Override
+            public String replace() {
+                return "";
+            }
         };
         parameter.annotations=new Annotation[]{param};
         parameter.name=name;

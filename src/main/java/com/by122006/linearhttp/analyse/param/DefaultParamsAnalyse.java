@@ -11,6 +11,7 @@ import com.by122006.linearhttp.annotations.Post;
 import com.by122006.linearhttp.interfaces.IParamsAnalyse;
 import com.by122006.linearhttp.interfaces.IParamsHandler;
 import com.by122006.linearhttp.interfaces.IRequestHandler;
+import com.by122006.linearhttp.utils.StringUtil;
 
 import java.lang.reflect.Method;
 
@@ -19,6 +20,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
     @Override
     public ResultBox get(String url, HttpRpc httpRPC, Method method, Get get, ResultBody.Parameter[] parameters, IRequestHandler iRequestHandler) throws Exception {
         StringBuilder str = new StringBuilder();
+
         if (!url.contains("?")) {
             url += "?";
         }
@@ -38,6 +40,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
     @Override
     public ResultBox post(String url, HttpRpc httpRPC, Method method, Post post, ResultBody.Parameter[] parameters, IRequestHandler iRequestHandler) throws Exception {
         String str;
+
         if (parameters.length == 1) {
             Param annotation = parameters[0].getAnnotation(Param.class);
             if (annotation != null && annotation.unBox()) {

@@ -123,13 +123,13 @@ public class ResultBody<R, M> {
                 String url = finalClassUrl+"/" + (StringUtil.isEmpty(post.path())
                         ?post.prePath() + "/" + requestName + "/"
                         : post.path() + "/");
-                url = formatUrl(url);
+                url = formatUrl(url,parameters);
                 resultBox= iParamsAnalyse.post(url,classAnnotation,method,post,parameters, iRequestHandler);
             } else if (get != null) {
                 String url = finalClassUrl+"/" + (StringUtil.isEmpty(get.path())
                         ? get.prePath() + "/" + requestName + "/"
                         : get.path() + "/");
-                url = formatUrl(url);
+                url = formatUrl(url,parameters);
                 resultBox = iParamsAnalyse.get(url,classAnnotation,method,get,parameters, iRequestHandler);
             }else throw new RuntimeException("unknow request method");
             int httpCode = resultBox.getHttpCode();
@@ -183,7 +183,7 @@ public class ResultBody<R, M> {
     }
 
 
-    public String formatUrl(String oUrl) {
+    public String formatUrl(String oUrl, Parameter[] parameters) {
         String end = "";
         if (oUrl.contains("?")) end = oUrl.substring(oUrl.indexOf("?"));
         int index = oUrl.indexOf("//");
@@ -198,7 +198,15 @@ public class ResultBody<R, M> {
             oUrl = oUrl.replace("//", "/");
         }
         if (oUrl.endsWith("/")) oUrl = oUrl.substring(0, oUrl.length() - 1);
-        return head + "//" + oUrl + end;
+        String rUrl= head + "//" + oUrl + end;
+
+        for (ResultBody.Parameter parameter:parameters){
+            Param annotation = parameter.getAnnotation(Param.class);
+            if (!StringUtil.isEmpty(annotation.replace())){
+                rUrl=rUrl.replace("{"+parameter.name+"}",String.valueOf(parameter.value));
+            }
+        }
+        return rUrl;
     }
 
     private void error(Throwable e) {
