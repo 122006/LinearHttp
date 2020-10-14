@@ -26,8 +26,8 @@ public class DefaultParamsHandler implements IParamsHandler {
         parameters=ArraysUtil.concat(parameters,list.toArray(new ResultBody.Parameter[0]));
         AddParams addParams = method.getAnnotation(AddParams.class);
 
-        String[] strings = addParams.value();
-        if (strings.length > 0) {
+        String[] strings=null;
+        if (addParams!=null&&(strings=addParams.value()).length > 0) {
             ResultBody.Parameter[] adds = handle(strings);
             return ArraysUtil.concat(parameters, adds);
         } else
