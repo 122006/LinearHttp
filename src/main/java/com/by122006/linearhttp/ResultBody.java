@@ -144,6 +144,7 @@ public class ResultBody<R, M> {
     }
 
     private Parameter[] getParameters(Method method, Object[] args) {
+        if (args.length==0) return new Parameter[0];
         //java7没有getParameters方法
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         int parameterCount = parameterAnnotations.length;
