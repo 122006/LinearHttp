@@ -21,7 +21,7 @@ public class DefaultParamsHandler implements IParamsHandler {
         HashMap<String, LinearHttp.ResultAction<?>> stringResultActionHashMap = defaultAddParams();
         List<ResultBody.Parameter> list=new ArrayList<>();
         for(Map.Entry<String, LinearHttp.ResultAction<?>> co:stringResultActionHashMap.entrySet()){
-            list.add(createParameter(co.getKey(),co.getValue()));
+            list.add(createParameter(co.getKey(),co.getValue().action()));
         }
         parameters=ArraysUtil.concat(parameters,list.toArray(new ResultBody.Parameter[0]));
         AddParams addParams = method.getAnnotation(AddParams.class);
