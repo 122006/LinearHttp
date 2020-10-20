@@ -17,19 +17,20 @@ import java.util.Map;
 
 public class DefaultParamsHandler implements IParamsHandler {
     @Override
-    public ResultBody.Parameter[] handler(Method method, ResultBody.Parameter[] parameters) throws Exception {
+    public List<ResultBody.Parameter> handler(Method method, List<ResultBody.Parameter> parameters) throws Exception{
         HashMap<String, LinearHttp.ResultAction<?>> stringResultActionHashMap = defaultAddParams();
         List<ResultBody.Parameter> list=new ArrayList<>();
         for(Map.Entry<String, LinearHttp.ResultAction<?>> co:stringResultActionHashMap.entrySet()){
             list.add(createParameter(co.getKey(),co.getValue().action()));
         }
-        parameters=ArraysUtil.concat(parameters,list.toArray(new ResultBody.Parameter[0]));
+        parameters.addAll(list);
         AddParams addParams = method.getAnnotation(AddParams.class);
 
         String[] strings=null;
         if (addParams!=null&&(strings=addParams.value()).length > 0) {
-            ResultBody.Parameter[] adds = handle(strings);
-            return ArraysUtil.concat(parameters, adds);
+            List<ResultBody.Parameter> adds = handle(strings);
+            parameters.addAll(adds);
+            return parameters;
         } else
             return parameters;
     }
@@ -40,14 +41,14 @@ public class DefaultParamsHandler implements IParamsHandler {
         return new HashMap<>();
     }
 
-    public ResultBody.Parameter[] handle(String[] addParamsKey) throws Exception {
+    public List<ResultBody.Parameter> handle(String[] addParamsKey) throws Exception {
         ArrayList<ResultBody.Parameter> list=new ArrayList<>();
         for (String str:addParamsKey) {
             ResultBody.Parameter parameter = createParameter(str, addParams().get(str).action());
             list.add(parameter);
         }
 
-        return list.toArray(new ResultBody.Parameter[0]);
+        return list;
     }
 
     public ResultBody.Parameter createParameter(String name, Object value) {

@@ -8,9 +8,10 @@ import com.by122006.linearhttp.annotations.HttpRpc;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 
 public interface IParamsHandler {
-    public ResultBody.Parameter[] handler(Method method, ResultBody.Parameter[] parameters) throws Exception;
+    public List<ResultBody.Parameter> handler(Method method, List<ResultBody.Parameter> parameters) throws Exception;
 
 
 }

@@ -15,7 +15,10 @@ import lombok.experimental.Accessors;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 @Accessors(chain = true)
 public class ResultBody<R, M> {
@@ -117,7 +120,8 @@ public class ResultBody<R, M> {
             String requestName = method.getName();
             ResultBox resultBox;
 
-            Parameter[] parameters = getParameters(method, args);
+            List<Parameter> parameters =new ArrayList<>();
+            Collections.addAll(parameters,getParameters(method, args));
             parameters=iParamsHandler.handler(method,parameters);
             if (post != null) {
                 String url = finalClassUrl+"/" + (StringUtil.isEmpty(post.path())
@@ -184,7 +188,7 @@ public class ResultBody<R, M> {
     }
 
 
-    public String formatUrl(String oUrl, Parameter[] parameters) {
+    public String formatUrl(String oUrl, List<ResultBody.Parameter> parameters) {
         String end = "";
         if (oUrl.contains("?")) end = oUrl.substring(oUrl.indexOf("?"));
         int index = oUrl.indexOf("//");

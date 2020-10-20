@@ -9,28 +9,27 @@ import com.by122006.linearhttp.annotations.HttpRpc;
 import com.by122006.linearhttp.annotations.Param;
 import com.by122006.linearhttp.annotations.Post;
 import com.by122006.linearhttp.interfaces.IParamsAnalyse;
-import com.by122006.linearhttp.interfaces.IParamsHandler;
 import com.by122006.linearhttp.interfaces.IRequestHandler;
-import com.by122006.linearhttp.utils.StringUtil;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class DefaultParamsAnalyse implements IParamsAnalyse {
 
     @Override
-    public ResultBox get(String url, HttpRpc httpRPC, Method method, Get get, ResultBody.Parameter[] parameters, IRequestHandler iRequestHandler) throws Exception {
+    public ResultBox get(String url, HttpRpc httpRPC, Method method, Get get, List<ResultBody.Parameter> parameters, IRequestHandler iRequestHandler) throws Exception {
         StringBuilder str = new StringBuilder();
 
         if (!url.contains("?")) {
             url += "?";
         }
 
-        for (int i = 0; i < parameters.length; i++) {
-            String name = parameters[i].name;
+        for (int i = 0; i < parameters.size(); i++) {
+            String name = parameters.get(i).name;
             str.append(name)
                     .append("=")
-                    .append(parameters[i].value);
-            if (i != parameters.length - 1) str.append("&");
+                    .append(parameters.get(i).value);
+            if (i != parameters.size() - 1) str.append("&");
         }
 
         String[] headers = get.headers().length == 0 ? httpRPC.headers() : get.headers();
@@ -38,23 +37,23 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
     }
 
     @Override
-    public ResultBox post(String url, HttpRpc httpRPC, Method method, Post post, ResultBody.Parameter[] parameters, IRequestHandler iRequestHandler) throws Exception {
+    public ResultBox post(String url, HttpRpc httpRPC, Method method, Post post, List<ResultBody.Parameter> parameters, IRequestHandler iRequestHandler) throws Exception {
         String str;
 
-        if (parameters.length == 1) {
-            Param annotation = parameters[0].getAnnotation(Param.class);
+        if (parameters.size() == 1) {
+            Param annotation = parameters.get(0).getAnnotation(Param.class);
             if (annotation != null && annotation.unBox()) {
                 JSONObject jsonObject = new JSONObject();
-                jsonObject.put(parameters[0].name, parameters[0].value);
+                jsonObject.put(parameters.get(0).name, parameters.get(0).value);
                 str = jsonObject.toJSONString();
             } else {
-                str = JSON.toJSONString(parameters[0].value);
+                str = JSON.toJSONString(parameters.get(0).value);
             }
         } else {
             //多参数一定是拆分
             JSONObject jsonObject = new JSONObject();
-            for (int i = 0; i < parameters.length; i++) {
-                jsonObject.put(parameters[i].name, parameters[i].value);
+            for (ResultBody.Parameter parameter:parameters) {
+                jsonObject.put(parameter.name, parameter.value);
             }
             str = jsonObject.toJSONString();
 
