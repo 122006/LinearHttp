@@ -120,22 +120,22 @@ public class ResultBody<R, M> {
             String requestName = method.getName();
             ResultBox resultBox;
 
-            List<Parameter> parameters =new ArrayList<>();
-            Collections.addAll(parameters,getParameters(method, args));
-            parameters=iParamsHandler.handler(method,parameters);
+            List<Parameter> parameters = new ArrayList<>();
+            Collections.addAll(parameters, getParameters(method, args));
+            parameters = iParamsHandler.handler(method, parameters);
             if (post != null) {
-                String url = finalClassUrl+"/" + (StringUtil.isEmpty(post.path())
-                        ?post.prePath() + "/" + requestName + "/"
+                String url = finalClassUrl + "/" + (StringUtil.isEmpty(post.path())
+                        ? post.prePath() + "/" + requestName + "/"
                         : post.path() + "/");
-                url = formatUrl(url,parameters);
-                resultBox= iParamsAnalyse.post(url,classAnnotation,method,post,parameters, iRequestHandler);
+                url = formatUrl(url, parameters);
+                resultBox = iParamsAnalyse.post(url, classAnnotation, method, post, parameters, iRequestHandler);
             } else if (get != null) {
-                String url = finalClassUrl+"/" + (StringUtil.isEmpty(get.path())
+                String url = finalClassUrl + "/" + (StringUtil.isEmpty(get.path())
                         ? get.prePath() + "/" + requestName + "/"
                         : get.path() + "/");
-                url = formatUrl(url,parameters);
-                resultBox = iParamsAnalyse.get(url,classAnnotation,method,get,parameters, iRequestHandler);
-            }else throw new RuntimeException("unknow request method");
+                url = formatUrl(url, parameters);
+                resultBox = iParamsAnalyse.get(url, classAnnotation, method, get, parameters, iRequestHandler);
+            } else throw new RuntimeException("unknow request method");
             int httpCode = resultBox.getHttpCode();
             iResultAnalyse.codeCheck(httpCode, resultBox.getResult());
             Class<?> returnType = method.getReturnType();
@@ -148,7 +148,7 @@ public class ResultBody<R, M> {
     }
 
     private Parameter[] getParameters(Method method, Object[] args) {
-        if (args==null||args.length==0) return new Parameter[0];
+        if (args == null || args.length == 0) return new Parameter[0];
         //java7没有getParameters方法
         Annotation[][] parameterAnnotations = method.getParameterAnnotations();
         int parameterCount = parameterAnnotations.length;
@@ -203,14 +203,20 @@ public class ResultBody<R, M> {
             oUrl = oUrl.replace("//", "/");
         }
         if (oUrl.endsWith("/")) oUrl = oUrl.substring(0, oUrl.length() - 1);
-        String rUrl= head + "//" + oUrl + end;
+        String rUrl = head + "//" + oUrl + end;
 
-        for (ResultBody.Parameter parameter:parameters){
+        List<ResultBody.Parameter> deleteList = new ArrayList<>();
+        for (ResultBody.Parameter parameter : parameters) {
             Param annotation = parameter.getAnnotation(Param.class);
-            if (!StringUtil.isEmpty(annotation.replace())){
-                rUrl=rUrl.replace("{"+parameter.name+"}",String.valueOf(parameter.value));
+            if (!StringUtil.isEmpty(annotation.restfulStr())) {
+                rUrl = rUrl.replace("{" + annotation.restfulStr() + "}", String.valueOf(parameter.value));
+                deleteList.add(parameter);
+            } else if (annotation.restful()) {
+                rUrl = rUrl.replace("{" + parameter.name + "}", String.valueOf(parameter.value));
+                deleteList.add(parameter);
             }
         }
+        parameters.removeAll(deleteList);
         return rUrl;
     }
 

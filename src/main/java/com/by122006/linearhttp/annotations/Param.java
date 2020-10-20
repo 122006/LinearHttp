@@ -15,9 +15,12 @@ public @interface Param {
      * true： 这是一个类拆分字段（只有一个字段），{"字段名":xx}
      */
     public boolean unBox() default false;
-
     /**
-     * 替换url中的指定字符，如果指定字符串会替换url中的"{value}"内容，且不认为基础参数
+     * 替换url中的指定字符(restful风格)，如果为true会替换url中的"{value}"内容，且不认为其为参数
      */
-    public String replace() default "";
+    public boolean restful() default false;
+    /**
+     * 替换url中的指定字符(restful风格)，如果指定字符串会替换url中的"{字符串}"内容，且不认为其为参数
+     */
+    public String restfulStr() default "";
 }

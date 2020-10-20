@@ -70,9 +70,15 @@ public class DefaultParamsHandler implements IParamsHandler {
             }
 
             @Override
-            public String replace() {
+            public boolean restful() {
+                return false;
+            }
+
+            @Override
+            public String restfulStr() {
                 return "";
             }
+
         };
         parameter.annotations=new Annotation[]{param};
         parameter.name=name;
