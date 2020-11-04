@@ -23,6 +23,8 @@ public class Demo {
                 .setFinallyCallBack(()->{})
                 //开始同步执行请求 异步请求：asyncExec()
                 .exec();
+
+        LinearHttp.with(HttpTest.class).abc123(123);
     }
 }
 

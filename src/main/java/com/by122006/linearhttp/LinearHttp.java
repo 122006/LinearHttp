@@ -12,12 +12,6 @@ import java.lang.reflect.*;
 public class LinearHttp<M> {
 
     final Class<M> requestClass;
-    //    private CallBack<JSON> callBack;
-//    private Function<R , ResultAction<?>> re;
-//    public StationWeb setCallBack(CallBack<JSON> callBack) {
-//        this.callBack = callBack;
-//        return this;
-//    }
 
     private LinearHttp(Class<M> requestClass) {
         this.requestClass = requestClass;
@@ -25,6 +19,12 @@ public class LinearHttp<M> {
 
     public static <M> LinearHttp<M> create(Class<M> rClass) {
         return new LinearHttp<M>(rClass);
+    }
+
+
+    public static <M> M with(Class<M> rClass) {
+        ResultBody<Object, M> objectMResultBody = new ResultBody<>(rClass);
+        return objectMResultBody.getM();
     }
 
     public interface CallBack<M> {

@@ -10,6 +10,10 @@
                                                                                   
          public class Demo {
              public static void main(String[] args) {
+                 //方法1 直接调用，自行构建业务代码处理异常
+                 LinearHttp.with(HttpTest.class).abc123(123);
+                 
+                 //方法2 使用封装器进行代码异常处理
                  LinearHttp.create(HttpTest.class)
                          .query(a -> a.heartBeat(3))
                          .setSuccessCallBack(System.out::println)
@@ -58,3 +62,6 @@
 
 * 注意事项
 
+    1. android中使用可能需要加入混淆语句`-keep interface xxxx接口名 {*;}`或注解指定接口url（而不是方法名）
+    
+    

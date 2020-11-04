@@ -9,6 +9,7 @@ import com.by122006.linearhttp.interfaces.IResultAnalyse;
 import com.by122006.linearhttp.annotations.*;
 import com.by122006.linearhttp.exceptions.*;
 import com.by122006.linearhttp.utils.*;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -26,19 +27,24 @@ public class ResultBody<R, M> {
     private final LinearHttp.Function<R, M> result;
     LinearHttp<M> linearHttp;
     Class<M> requestClass;
-    M m;
-
+    @Getter
+    private M m;
     private static final HashMap<Class<? extends IResultAnalyse>, IResultAnalyse> resultAnalyseMap = new HashMap<>();
     private static final HashMap<Class<? extends IRequestHandler>, IRequestHandler> requestHandlerHashMap = new HashMap<>();
     private static final HashMap<Class<? extends IParamsAnalyse>, IParamsAnalyse> paramsAnalyseHashMap = new HashMap<>();
     private static final HashMap<Class<? extends IParamsHandler>, IParamsHandler> paramsHandlerHashMap = new HashMap<>();
-
     IResultAnalyse iResultAnalyse;
     IRequestHandler iRequestHandler;
     IParamsAnalyse iParamsAnalyse;
     IParamsHandler iParamsHandler;
 
-    public ResultBody(LinearHttp<M> linearHttp, LinearHttp.Function<R, M> result) {
+    protected ResultBody(Class<M> requestClass) {
+        this.result = null;
+        this.requestClass = requestClass;
+        action();
+    }
+
+    protected ResultBody(LinearHttp<M> linearHttp, LinearHttp.Function<R, M> result) {
         this.linearHttp = linearHttp;
         this.result = result;
         this.requestClass = linearHttp.requestClass;
@@ -146,6 +152,7 @@ public class ResultBody<R, M> {
         });
         m = requestClass.cast(o);
     }
+
 
     private Parameter[] getParameters(Method method, Object[] args) {
         if (args == null || args.length == 0) return new Parameter[0];
