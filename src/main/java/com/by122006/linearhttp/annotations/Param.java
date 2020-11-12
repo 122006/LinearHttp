@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Param {
-    public String value();
+    public String value() default "";
 
     /**
      * 如果是post请求且只有一个参数：</p>

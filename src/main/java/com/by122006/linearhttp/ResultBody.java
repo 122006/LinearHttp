@@ -167,7 +167,12 @@ public class ResultBody<R, M> {
             parameters[i] = new Parameter();
             parameters[i].annotations = parameterAnnotations[i];
             parameters[i].type = parameterTypes[i];
-            parameters[i].name = parameters[i].getAnnotation(Param.class).value();
+            Param annotation = parameters[i].getAnnotation(Param.class);
+            if (annotation==null|| StringUtil.isEmpty(annotation.value())){
+                parameters[i].name =method.getParameters()[i].getName();
+            }else {
+                parameters[i].name =annotation.value();
+            }
             parameters[i].value = args[i];
         }
 
