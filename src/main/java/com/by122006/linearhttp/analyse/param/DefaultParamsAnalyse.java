@@ -1,6 +1,7 @@
 package com.by122006.linearhttp.analyse.param;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.by122006.linearhttp.ResultBody;
 import com.by122006.linearhttp.analyse.request.ResultBox;
@@ -11,8 +12,11 @@ import com.by122006.linearhttp.annotations.Post;
 import com.by122006.linearhttp.interfaces.IParamsAnalyse;
 import com.by122006.linearhttp.interfaces.IRequestHandler;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public class DefaultParamsAnalyse implements IParamsAnalyse {
@@ -27,9 +31,29 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
 
         for (int i = 0; i < parameters.size(); i++) {
             String name = parameters.get(i).name;
+            Object value = parameters.get(i).value;
+            if (value.getClass().isArray()){
+                int len = Array.getLength(value);
+                StringBuilder re= new StringBuilder();
+                for(int a = 0; a < len; a++) {
+                    Object item = Array.get(value, a);
+                    if (a!=len-1) re.append(",");
+                    re.append(item);
+                }
+                value=re;
+            }else  if (value instanceof Collection){
+                Iterator<?> iterator = ((Collection<?>) value).iterator();
+                StringBuilder re= new StringBuilder();
+                while (iterator.hasNext()) {
+                    Object string = iterator.next();
+                    if (iterator.hasNext()) re.append(",");
+                    re.append(string);
+                }
+                value=re;
+            }
             str.append(name)
                     .append("=")
-                    .append(parameters.get(i).value);
+                    .append(value);
             if (i != parameters.size() - 1) str.append("&");
         }
 

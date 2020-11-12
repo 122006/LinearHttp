@@ -26,11 +26,11 @@ public @interface HttpRpc {
      */
     Class<? extends IRequestHandler> requestHandler() default HUCHandler.class;
     /**
-     * 网络请求实现类
+     * 参数分析类
      */
     Class<? extends IParamsAnalyse> paramsAnalyse() default DefaultParamsAnalyse.class;
     /**
-     * 网络请求常量类
+     * 参数处理类
      */
     Class<? extends IParamsHandler> paramsHandler() default DefaultParamsHandler.class;
     /**
