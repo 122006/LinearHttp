@@ -37,7 +37,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 StringBuilder re= new StringBuilder();
                 for(int a = 0; a < len; a++) {
                     Object item = Array.get(value, a);
-                    if (a!=len-1) re.append(",");
+                    if (a!=0) re.append(",");
                     re.append(item);
                 }
                 value=re;
@@ -46,8 +46,8 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 StringBuilder re= new StringBuilder();
                 while (iterator.hasNext()) {
                     Object string = iterator.next();
-                    if (iterator.hasNext()) re.append(",");
                     re.append(string);
+                    if (iterator.hasNext()) re.append(",");
                 }
                 value=re;
             }
