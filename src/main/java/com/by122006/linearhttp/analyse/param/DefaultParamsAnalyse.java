@@ -32,7 +32,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
         for (int i = 0; i < parameters.size(); i++) {
             String name = parameters.get(i).name;
             Object value = parameters.get(i).value;
-            if (value.getClass().isArray()){
+            if (value!=null&&value.getClass().isArray()){
                 int len = Array.getLength(value);
                 StringBuilder re= new StringBuilder();
                 for(int a = 0; a < len; a++) {
