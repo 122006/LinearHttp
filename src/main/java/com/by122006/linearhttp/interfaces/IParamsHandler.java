@@ -12,6 +12,4 @@ import java.util.List;
 
 public interface IParamsHandler {
     public List<ResultBody.Parameter> handler(Method method, List<ResultBody.Parameter> parameters) throws Exception;
-
-
 }

@@ -44,10 +44,13 @@ public class DefaultDataAnalyse implements IResultAnalyse {
 
     @Override
     public <T> T analyse(String object, Type t) throws FailException {
+        Class clazz=t instanceof Class? (Class) t : (Class) ((ParameterizedType) t).getRawType();
+        if (clazz.isAssignableFrom(String.class)){
+            return (T) String.valueOf(object);
+        }
         JSONObject jsonObject = JSONObject.parseObject(object);
         verifyCode(jsonObject);
         Object data = getResult(jsonObject);
-        Class clazz=t instanceof Class? (Class) t : (Class) ((ParameterizedType) t).getRawType();
         if (data == null) {
             return null;
         } else if (data.getClass() == t) {

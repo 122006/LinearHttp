@@ -129,19 +129,23 @@ public class ResultBody<R, M> {
             List<Parameter> parameters = new ArrayList<>();
             Collections.addAll(parameters, getParameters(method, args));
             parameters = iParamsHandler.handler(method, parameters);
-            if (post != null) {
-                String url = finalClassUrl + "/" + (StringUtil.isEmpty(post.path())
-                        ? post.prePath() + "/" + requestName + "/"
-                        : post.path() + "/");
-                url = formatUrl(url, parameters);
-                resultBox = iParamsAnalyse.post(url, classAnnotation, method, post, parameters, iRequestHandler);
-            } else if (get != null) {
-                String url = finalClassUrl + "/" + (StringUtil.isEmpty(get.path())
-                        ? get.prePath() + "/" + requestName + "/"
-                        : get.path() + "/");
-                url = formatUrl(url, parameters);
-                resultBox = iParamsAnalyse.get(url, classAnnotation, method, get, parameters, iRequestHandler);
-            } else throw new RuntimeException("unknow request method");
+            if (testResultBox != null) {
+                resultBox=testResultBox;
+            } else {
+                if (post != null) {
+                    String url = finalClassUrl + "/" + (StringUtil.isEmpty(post.path())
+                            ? post.prePath() + "/" + requestName + "/"
+                            : post.path() + "/");
+                    url = formatUrl(url, parameters);
+                    resultBox = iParamsAnalyse.post(url, classAnnotation, method, post, parameters, iRequestHandler);
+                } else if (get != null) {
+                    String url = finalClassUrl + "/" + (StringUtil.isEmpty(get.path())
+                            ? get.prePath() + "/" + requestName + "/"
+                            : get.path() + "/");
+                    url = formatUrl(url, parameters);
+                    resultBox = iParamsAnalyse.get(url, classAnnotation, method, get, parameters, iRequestHandler);
+                } else throw new RuntimeException("unknow request method");
+            }
             int httpCode = resultBox.getHttpCode();
             iResultAnalyse.codeCheck(httpCode, resultBox.getResult());
             Class<?> returnType = method.getReturnType();
@@ -168,10 +172,10 @@ public class ResultBody<R, M> {
             parameters[i].annotations = parameterAnnotations[i];
             parameters[i].type = parameterTypes[i];
             Param annotation = parameters[i].getAnnotation(Param.class);
-            if (annotation==null|| StringUtil.isEmpty(annotation.value())){
-                parameters[i].name =method.getParameters()[i].getName();
-            }else {
-                parameters[i].name =annotation.value();
+            if (annotation == null || StringUtil.isEmpty(annotation.value())) {
+                parameters[i].name = method.getParameters()[i].getName();
+            } else {
+                parameters[i].name = annotation.value();
             }
             parameters[i].value = args[i];
         }
@@ -310,6 +314,8 @@ public class ResultBody<R, M> {
     LinearHttp.ErrorCallBack errorCallBack;
     @Setter
     LinearHttp.EmptyAction finallyCallBack;
+    @Setter
+    ResultBox testResultBox;
 
 //        public ResultBody<M> addParams(String key, Object value) {
 //            linearHttp.re.params.put(key, value);
