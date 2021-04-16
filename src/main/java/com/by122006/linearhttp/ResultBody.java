@@ -130,7 +130,7 @@ public class ResultBody<R, M> {
             Collections.addAll(parameters, getParameters(method, args));
             parameters = iParamsHandler.handler(method, parameters);
             if (testResultBox != null) {
-                resultBox=testResultBox;
+                resultBox = testResultBox;
             } else {
                 if (post != null) {
                     String url = finalClassUrl + "/" + (StringUtil.isEmpty(post.path())
@@ -206,7 +206,10 @@ public class ResultBody<R, M> {
 
     public String formatUrl(String oUrl, List<ResultBody.Parameter> parameters) {
         String end = "";
-        if (oUrl.contains("?")) end = oUrl.substring(oUrl.indexOf("?"));
+        if (oUrl.contains("?")) {
+            oUrl = oUrl.substring(0, oUrl.indexOf("?"));
+            end = oUrl.substring(oUrl.indexOf("?"));
+        }
         int index = oUrl.indexOf("//");
         String head = "";
         if (index != -1) {
