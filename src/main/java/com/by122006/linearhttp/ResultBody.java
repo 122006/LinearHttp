@@ -221,8 +221,8 @@ public class ResultBody<R, M> {
         while (oUrl.contains("//")) {
             oUrl = oUrl.replace("//", "/");
         }
-        if (oUrl.endsWith("/")) oUrl = oUrl.substring(0, oUrl.length() - 1);
         String rUrl = head + "//" + oUrl + end;
+        if (rUrl.endsWith("/")) rUrl = rUrl.substring(0, rUrl.length() - 1);
 
         List<ResultBody.Parameter> deleteList = new ArrayList<>();
         for (ResultBody.Parameter parameter : parameters) {
