@@ -148,11 +148,7 @@ public class ResultBody<R, M> {
             }
             int httpCode = resultBox.getHttpCode();
             iResultAnalyse.codeCheck(httpCode, resultBox.getResult());
-            Class<?> returnType = method.getReturnType();
-            if (returnType == void.class || returnType == Void.class) {
-                return null;
-            } else
-                return iResultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
+            return iResultAnalyse.analyse(resultBox.getResult(), method.getGenericReturnType());
         });
         m = requestClass.cast(o);
     }
