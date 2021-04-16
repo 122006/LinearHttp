@@ -207,8 +207,8 @@ public class ResultBody<R, M> {
     public String formatUrl(String oUrl, List<ResultBody.Parameter> parameters) {
         String end = "";
         if (oUrl.contains("?")) {
-            oUrl = oUrl.substring(0, oUrl.indexOf("?"));
             end = oUrl.substring(oUrl.indexOf("?"));
+            oUrl = oUrl.substring(0, oUrl.indexOf("?"));
         }
         int index = oUrl.indexOf("//");
         String head = "";
