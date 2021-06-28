@@ -77,6 +77,11 @@ public class DefaultParamsHandler implements IParamsHandler {
                 return "";
             }
 
+            @Override
+            public boolean header() {
+                return false;
+            }
+
         };
         parameter.annotations=new Annotation[]{param};
         parameter.name=name;

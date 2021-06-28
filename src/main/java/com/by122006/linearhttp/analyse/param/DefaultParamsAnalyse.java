@@ -14,10 +14,7 @@ import com.by122006.linearhttp.interfaces.IRequestHandler;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class DefaultParamsAnalyse implements IParamsAnalyse {
 
@@ -28,10 +25,17 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
         if (!url.contains("?")) {
             url += "?";
         }
-
+        Set<String> header=new HashSet<>();
+        header.addAll(Arrays.asList(httpRPC.headers()));
+        header.addAll(Arrays.asList(get.headers()));
         for (int i = 0; i < parameters.size(); i++) {
-            String name = parameters.get(i).name;
-            Object value = parameters.get(i).value;
+            ResultBody.Parameter parameter = parameters.get(i);
+            String name = parameter.name;
+            Object value = parameter.value;
+            if (parameter.getAnnotation(Param.class).header()){
+                header.add(name +": "+value);
+                continue;
+            }
             if (value!=null&&value.getClass().isArray()){
                 int len = Array.getLength(value);
                 StringBuilder re= new StringBuilder();
@@ -57,14 +61,24 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
             if (i != parameters.size() - 1) str.append("&");
         }
 
-        String[] headers = get.headers().length == 0 ? httpRPC.headers() : get.headers();
-        return iRequestHandler.get(headers, url+ str.toString());
+        return iRequestHandler.get(header.toArray(new String[0]), url+ str.toString());
     }
 
     @Override
     public ResultBox post(String url, HttpRpc httpRPC, Method method, Post post, List<ResultBody.Parameter> parameters, IRequestHandler iRequestHandler) throws Exception {
         String str;
-
+        Set<String> header=new HashSet<>();
+        header.addAll(Arrays.asList(httpRPC.headers()));
+        header.addAll(Arrays.asList(post.headers()));
+        List<ResultBody.Parameter> deleteList=new ArrayList<>();
+        for (ResultBody.Parameter parameter:parameters){
+            if (parameter.getAnnotation(Param.class).header()){
+                header.add(parameter.name +": "+parameter.value);
+                deleteList.add(parameter);
+                continue;
+            }
+        }
+        parameters.removeAll(deleteList);
         if (parameters.size() == 1) {
             Param annotation = parameters.get(0).getAnnotation(Param.class);
             if (annotation != null && annotation.unBox()) {
@@ -83,8 +97,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
             str = jsonObject.toJSONString();
 
         }
-        String[] headers = post.headers().length == 0 ? httpRPC.headers() : post.headers();
-        return iRequestHandler.post(headers, url, str);
+        return iRequestHandler.post(header.toArray(new String[0]), url, str);
     }
 
 

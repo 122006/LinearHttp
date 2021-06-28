@@ -15,15 +15,17 @@ import java.util.Map;
 public class DefaultDataAnalyse implements IResultAnalyse {
 
 
-    public String getMsg(JSONObject jsonObject){
+    public String getMsg(JSONObject jsonObject) {
         return jsonObject.getString("msg");
     }
-    public Object getResult(JSONObject jsonObject){
+
+    public Object getResult(JSONObject jsonObject) {
         return jsonObject.get("result");
     }
 
-    public void verifyCode(JSONObject jsonObject) throws FailException{
-        int errorCode=jsonObject.getIntValue("code");
+    public void verifyCode(JSONObject jsonObject) throws FailException {
+        if (!jsonObject.containsKey("code")) throw new FailException(Integer.MIN_VALUE, "unknown code");
+        int errorCode = jsonObject.getIntValue("code");
         if (errorCode != 0 && errorCode != 200) {
             throw new FailException(errorCode, getMsg(jsonObject));
         }
@@ -44,13 +46,13 @@ public class DefaultDataAnalyse implements IResultAnalyse {
 
     @Override
     public <T> T analyse(String object, Type t) throws FailException {
-        Class clazz=t instanceof Class? (Class) t : (Class) ((ParameterizedType) t).getRawType();
-        if (clazz==byte[].class){
-            return (T)object.getBytes();
+        Class clazz = t instanceof Class ? (Class) t : (Class) ((ParameterizedType) t).getRawType();
+        if (clazz == byte[].class) {
+            return (T) object.getBytes();
         }
         JSONObject jsonObject = JSONObject.parseObject(object);
         verifyCode(jsonObject);
-        if (clazz==void.class||clazz==Void.class){
+        if (clazz == void.class || clazz == Void.class) {
             return null;
         }
         Object data = getResult(jsonObject);
@@ -66,23 +68,24 @@ public class DefaultDataAnalyse implements IResultAnalyse {
             return (T) JSON.parseObject(String.valueOf(data));
         } else if (clazz.isAssignableFrom(List.class)) {
             Type[] pt = ((ParameterizedType) t).getActualTypeArguments();
-            if (pt.length==0) return (T) JSON.parseArray(String.valueOf(data));
+            if (pt.length == 0) return (T) JSON.parseArray(String.valueOf(data));
             return (T) JSON.parseArray(String.valueOf(data), (Class) pt[0]);
         } else if (clazz.isArray()) {
             Class componentType = clazz.getComponentType();
             if (data instanceof String) {
                 List list = JSONArray.parseArray((String) data, componentType);
-                return (T) list.toArray(getArray(componentType,0));
+                return (T) list.toArray(getArray(componentType, 0));
             } else if (data instanceof JSONArray) {
                 List list = JSONArray.parseArray(((JSONArray) data).toJSONString(), componentType);
-                return (T) list.toArray(getArray(componentType,0));
+                return (T) list.toArray(getArray(componentType, 0));
             }
         } else {
             return JSONObject.parseObject(String.valueOf(data), t);
         }
         throw new RuntimeException("无法解析返回类型");
     }
-    public static <T>  T[] getArray(Class<T> componentType,int length) {
+
+    public static <T> T[] getArray(Class<T> componentType, int length) {
         return (T[]) Array.newInstance(componentType, length);
     }
 }

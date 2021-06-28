@@ -23,4 +23,8 @@ public @interface Param {
      * 替换url中的指定字符(restful风格)，如果指定字符串会替换url中的"{字符串}"内容，且不认为其为参数
      */
     public String restfulStr() default "";
+    /**
+     * true 会添加该键值对到header中，且不认为其为参数
+     */
+    public boolean header() default false;
 }

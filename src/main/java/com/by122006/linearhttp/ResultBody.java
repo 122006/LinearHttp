@@ -229,6 +229,8 @@ public class ResultBody<R, M> {
             } else if (annotation.restful()) {
                 rUrl = rUrl.replace("{" + parameter.name + "}", String.valueOf(parameter.value));
                 deleteList.add(parameter);
+            } else if (annotation.header()) {
+                deleteList.add(parameter);
             }
         }
         parameters.removeAll(deleteList);
