@@ -89,6 +89,46 @@ public class DefaultParamsHandler implements IParamsHandler {
         parameter.value=value;
         return parameter;
     }
+    public ResultBody.Parameter createHeader(String name, Object value) {
+        ResultBody.Parameter parameter=new ResultBody.Parameter();
+        Param param = new Param(){
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Param.class;
+            }
+
+            @Override
+            public String value() {
+                return name;
+            }
+
+            @Override
+            public boolean unBox() {
+                return false;
+            }
+
+            @Override
+            public boolean restful() {
+                return false;
+            }
+
+            @Override
+            public String restfulStr() {
+                return "";
+            }
+
+            @Override
+            public boolean header() {
+                return true;
+            }
+
+        };
+        parameter.annotations=new Annotation[]{param};
+        parameter.name=name;
+        parameter.type=value.getClass();
+        parameter.value=value;
+        return parameter;
+    }
 
 
 }
