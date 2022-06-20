@@ -95,7 +95,8 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
             for (ResultBody.Parameter parameter:parameters) {
                 Param annotation = parameters.get(0).getAnnotation(Param.class);
                 if (annotation != null && annotation.unBox()) {
-                    jsonObject.put(parameters.get(0).name, parameters.get(0).value);
+                    JSONObject object= (JSONObject) JSONObject.toJSON(parameters.get(0).value);
+                    jsonObject.putAll(object);
                 } else {
                     jsonObject.put(parameter.name, parameter.value);
                 }
