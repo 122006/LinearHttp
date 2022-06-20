@@ -223,6 +223,7 @@ public class ResultBody<R, M> {
         List<ResultBody.Parameter> deleteList = new ArrayList<>();
         for (ResultBody.Parameter parameter : parameters) {
             Param annotation = parameter.getAnnotation(Param.class);
+            if (annotation==null) continue;
             if (!StringUtil.isEmpty(annotation.restfulStr())) {
                 rUrl = rUrl.replace("{" + annotation.restfulStr() + "}", String.valueOf(parameter.value));
                 deleteList.add(parameter);

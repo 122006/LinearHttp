@@ -45,7 +45,7 @@ interface HttpTest {
      * <br>如果不需要解析返回值，请返回Void（如果使用action()调用可返回void）
      */
     @Get(prePath = "/connect")
-    String[] heartBeat(@Param("deviceId") int deviceId);
+    String[] heartBeat(int deviceId);
 
     /**
      * Post请求参数支持自动装箱，多个参数会合并为一个json进行数据传递而不用定义数据类</br>

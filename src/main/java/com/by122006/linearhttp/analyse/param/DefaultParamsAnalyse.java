@@ -32,7 +32,8 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
             ResultBody.Parameter parameter = parameters.get(i);
             String name = parameter.name;
             Object value = parameter.value;
-            if (parameter.getAnnotation(Param.class).header()){
+            final Param annotation = parameter.getAnnotation(Param.class);
+            if (annotation!=null&&annotation.header()){
                 header.add(name +": "+value);
                 continue;
             }
@@ -89,13 +90,17 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 str = JSON.toJSONString(parameters.get(0).value);
             }
         } else {
-            //多参数一定是拆分
+            //多参数
             JSONObject jsonObject = new JSONObject();
             for (ResultBody.Parameter parameter:parameters) {
-                jsonObject.put(parameter.name, parameter.value);
+                Param annotation = parameters.get(0).getAnnotation(Param.class);
+                if (annotation != null && annotation.unBox()) {
+                    jsonObject.put(parameters.get(0).name, parameters.get(0).value);
+                } else {
+                    jsonObject.put(parameter.name, parameter.value);
+                }
             }
             str = jsonObject.toJSONString();
-
         }
         return iRequestHandler.post(header.toArray(new String[0]), url, str);
     }
