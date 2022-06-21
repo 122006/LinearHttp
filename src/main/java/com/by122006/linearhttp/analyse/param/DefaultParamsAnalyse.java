@@ -112,7 +112,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 jsonObject.put(parameter.name, parameter.value);
             } else {
                 String object = JSONObject.toJSONString(parameter.value);
-                jsonObject.put(parameter.name, object.startsWith("{") ? JSONObject.parseObject(object) : object);
+                jsonObject.put(parameter.name, object.startsWith("[") ? JSONArray.parseArray(object) :object.startsWith("{") ? JSONObject.parseObject(object) : object);
             }
         }
         str = jsonObject.toJSONString();
