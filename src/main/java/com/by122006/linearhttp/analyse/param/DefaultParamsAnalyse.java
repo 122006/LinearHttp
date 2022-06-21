@@ -32,6 +32,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
             ResultBody.Parameter parameter = parameters.get(i);
             String name = parameter.name;
             Object value = parameter.value;
+            if (value == null) continue;
             final Param annotation = parameter.getAnnotation(Param.class);
             if (annotation != null && annotation.header()) {
                 header.add(name + ": " + value);
@@ -54,7 +55,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 for (int a = 0; a < len; a++) {
                     Object item = Array.get(value, a);
                     if (a != 0) re.append(",");
-                    re.append(isBaseType(item)?item:JSON.toJSONString(item));
+                    re.append(isBaseType(item) ? item : JSON.toJSONString(item));
                 }
                 str.append(name)
                         .append("=")
@@ -64,7 +65,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 StringBuilder re = new StringBuilder();
                 while (iterator.hasNext()) {
                     Object string = iterator.next();
-                    re.append(isBaseType(string)?string:JSON.toJSONString(string));
+                    re.append(isBaseType(string) ? string : JSON.toJSONString(string));
                     if (iterator.hasNext()) re.append(",");
                 }
                 str.append(name)
@@ -105,9 +106,13 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 //先序列化一次，防止丢失注解信息
                 String object = JSONObject.toJSONString(parameter.value);
                 jsonObject.putAll(JSONObject.parseObject(object));
+            } else if (parameter.value == null) {
+                continue;
+            } else if (isBaseType(parameter.value)) {
+                jsonObject.put(parameter.name, parameter.value);
             } else {
                 String object = JSONObject.toJSONString(parameter.value);
-                jsonObject.put(parameter.name, object.startsWith("{")?JSONObject.parseObject(object):object);
+                jsonObject.put(parameter.name, object.startsWith("{") ? JSONObject.parseObject(object) : object);
             }
         }
         str = jsonObject.toJSONString();
@@ -123,7 +128,8 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 className.equals(java.lang.Float.class) ||
                 className.equals(java.lang.Character.class) ||
                 className.equals(java.lang.Short.class) ||
-                className.equals(java.lang.Boolean.class)) {
+                className.equals(java.lang.Boolean.class)||
+                className.equals(java.lang.String.class)) {
             return true;
         }
         return false;
