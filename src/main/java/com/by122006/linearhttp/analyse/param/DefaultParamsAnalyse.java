@@ -25,7 +25,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
         if (!url.contains("?")) {
             url += "?";
         }
-        Set<String> header=new HashSet<>();
+        Set<String> header = new HashSet<>();
         header.addAll(Arrays.asList(httpRPC.headers()));
         header.addAll(Arrays.asList(get.headers()));
         for (int i = 0; i < parameters.size(); i++) {
@@ -33,80 +33,86 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
             String name = parameter.name;
             Object value = parameter.value;
             final Param annotation = parameter.getAnnotation(Param.class);
-            if (annotation!=null&&annotation.header()){
-                header.add(name +": "+value);
+            if (annotation != null && annotation.header()) {
+                header.add(name + ": " + value);
                 continue;
-            }
-            if (value!=null&&value.getClass().isArray()){
-                int len = Array.getLength(value);
-                StringBuilder re= new StringBuilder();
-                for(int a = 0; a < len; a++) {
-                    Object item = Array.get(value, a);
-                    if (a!=0) re.append(",");
-                    re.append(item);
+            } else if (annotation != null && annotation.unBox()) {
+                String object = JSONObject.toJSONString(parameter.value);
+                final JSONObject jsonObject = JSON.parseObject(object);
+                final List<String> keys = new ArrayList<>(jsonObject.keySet());
+                for (int i1 = 0; i1 < keys.size(); i1++) {
+                    String key = keys.get(i);
+                    String value2 = jsonObject.getString(key);
+                    str.append(name)
+                            .append("=")
+                            .append(value2);
+                    if (i1 != keys.size() - 1) str.append("&");
                 }
-                value=re;
-            }else  if (value instanceof Collection){
+            } else if (value != null && value.getClass().isArray()) {
+                int len = Array.getLength(value);
+                StringBuilder re = new StringBuilder();
+                for (int a = 0; a < len; a++) {
+                    Object item = Array.get(value, a);
+                    if (a != 0) re.append(",");
+                    re.append(JSON.toJSONString(item));
+                }
+                str.append(name)
+                        .append("=")
+                        .append(re);
+            } else if (value instanceof Collection) {
                 Iterator<?> iterator = ((Collection<?>) value).iterator();
-                StringBuilder re= new StringBuilder();
+                StringBuilder re = new StringBuilder();
                 while (iterator.hasNext()) {
                     Object string = iterator.next();
-                    re.append(string);
+                    re.append(JSON.toJSONString(string));
                     if (iterator.hasNext()) re.append(",");
                 }
-                value=re;
+                str.append(name)
+                        .append("=")
+                        .append(re);
+            } else {
+                str.append(name)
+                        .append("=")
+                        .append(value);
             }
-            str.append(name)
-                    .append("=")
-                    .append(value);
             if (i != parameters.size() - 1) str.append("&");
+
         }
 
-        return iRequestHandler.get(header.toArray(new String[0]), url+ str.toString());
+        return iRequestHandler.get(header.toArray(new String[0]), url + str.toString());
     }
 
     @Override
     public ResultBox post(String url, HttpRpc httpRPC, Method method, Post post, List<ResultBody.Parameter> parameters, IRequestHandler iRequestHandler) throws Exception {
         String str;
-        Set<String> header=new HashSet<>();
+        Set<String> header = new HashSet<>();
         header.addAll(Arrays.asList(httpRPC.headers()));
         header.addAll(Arrays.asList(post.headers()));
-        List<ResultBody.Parameter> deleteList=new ArrayList<>();
-        for (ResultBody.Parameter parameter:parameters){
-            if (parameter.getAnnotation(Param.class).header()){
-                header.add(parameter.name +": "+parameter.value);
+        List<ResultBody.Parameter> deleteList = new ArrayList<>();
+        for (ResultBody.Parameter parameter : parameters) {
+            if (parameter.getAnnotation(Param.class).header()) {
+                header.add(parameter.name + ": " + parameter.value);
                 deleteList.add(parameter);
                 continue;
             }
         }
         parameters.removeAll(deleteList);
-        if (parameters.size() == 1) {
-            Param annotation = parameters.get(0).getAnnotation(Param.class);
+        //多参数
+        JSONObject jsonObject = new JSONObject();
+        for (ResultBody.Parameter parameter : parameters) {
+            Param annotation = parameter.getAnnotation(Param.class);
             if (annotation != null && annotation.unBox()) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put(parameters.get(0).name, parameters.get(0).value);
-                str = jsonObject.toJSONString();
+                //先序列化一次，防止丢失注解信息
+                String object = JSONObject.toJSONString(parameter.value);
+                jsonObject.putAll(JSONObject.parseObject(object));
             } else {
-                str = JSON.toJSONString(parameters.get(0).value);
+                String object = JSONObject.toJSONString(parameter.value);
+                jsonObject.put(parameter.name, JSONObject.parseObject(object));
             }
-        } else {
-            //多参数
-            JSONObject jsonObject = new JSONObject();
-            for (ResultBody.Parameter parameter:parameters) {
-                Param annotation = parameters.get(0).getAnnotation(Param.class);
-                if (annotation != null && annotation.unBox()) {
-                    JSONObject object= (JSONObject) JSONObject.toJSON(parameters.get(0).value);
-                    jsonObject.putAll(object);
-                } else {
-                    jsonObject.put(parameter.name, parameter.value);
-                }
-            }
-            str = jsonObject.toJSONString();
         }
+        str = jsonObject.toJSONString();
         return iRequestHandler.post(header.toArray(new String[0]), url, str);
     }
-
-
 
 
 }

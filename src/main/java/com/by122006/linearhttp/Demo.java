@@ -7,24 +7,28 @@ import com.by122006.linearhttp.analyse.request.HUCHandler;
 import com.by122006.linearhttp.analyse.result.DefaultDataAnalyse;
 import com.by122006.linearhttp.annotations.*;
 
+import java.util.Date;
 import java.util.List;
 
 public class Demo {
     public static void main(String[] args) {
-        LinearHttp.create(HttpTest.class)//定义需要使用的接口类
-                .query(a -> a.heartBeat(3))//指定网络请求方法并填充参数
-                //业务成功回调，直接使用接口定义格式的返回值进行业务处理
-                .setSuccessCallBack(System.out::println)
-                //【可选】ErrorCallBack，若未定义会throwable.getMessage()并转发至FailCallBack回调
-                .setErrorCallBack(throwable -> System.out.println("请求失败：" + throwable.getMessage()))
-                //FailCallBack定义处理网络请求中发生的任何错误，若未定义会抛出至上级
-                .setFailCallBack((errorCode, msg) -> System.out.println("请求失败：" + msg))
-                //【可选】网络请求结束回调
-                .setFinallyCallBack(()->{})
-                //开始同步执行请求 异步请求：asyncExec()
-                .exec();
 
-        LinearHttp.with(HttpTest.class).abc123(123);
+        System.out.println(JSONObject.toJSONString(new Date[]{new Date()}));
+
+//        LinearHttp.create(HttpTest.class)//定义需要使用的接口类
+//                .query(a -> a.heartBeat(3))//指定网络请求方法并填充参数
+//                //业务成功回调，直接使用接口定义格式的返回值进行业务处理
+//                .setSuccessCallBack(System.out::println)
+//                //【可选】ErrorCallBack，若未定义会throwable.getMessage()并转发至FailCallBack回调
+//                .setErrorCallBack(throwable -> System.out.println("请求失败：" + throwable.getMessage()))
+//                //FailCallBack定义处理网络请求中发生的任何错误，若未定义会抛出至上级
+//                .setFailCallBack((errorCode, msg) -> System.out.println("请求失败：" + msg))
+//                //【可选】网络请求结束回调
+//                .setFinallyCallBack(()->{})
+//                //开始同步执行请求 异步请求：asyncExec()
+//                .exec();
+//
+//        LinearHttp.with(HttpTest.class).abc123(123);
     }
 }
 

@@ -10,11 +10,13 @@ public @interface Param {
     public String value() default "";
 
     /**
-     * 如果是post请求且只有一个参数：</p>
-     * false（默认）: 这是一个封装类，解析该入参为string进行处理，复杂对象使用json解析</p>
-     * true： 这是一个类拆分字段（只有一个字段），{"字段名":xx}
+     * false（默认）: 这个类会作为参数列表的一个字段进行转化</p>
+     * true： 这个类的字段会被转化为参数列表的字段</p>
+     * 请不要注解于数组集合基础类型等无法解析的参数
+     *
      */
     public boolean unBox() default false;
+
     /**
      * 替换url中的指定字符(restful风格)，如果为true会替换url中的"{value}"内容，且不认为其为参数
      */
