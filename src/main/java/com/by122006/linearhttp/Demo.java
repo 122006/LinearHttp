@@ -1,5 +1,6 @@
 package com.by122006.linearhttp;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.by122006.linearhttp.analyse.param.DefaultParamsAnalyse;
 import com.by122006.linearhttp.annotations.Param;
@@ -12,8 +13,9 @@ import java.util.List;
 
 public class Demo {
     public static void main(String[] args) {
-
-        System.out.println(JSONObject.toJSONString(new Date[]{new Date()}));
+        JSONObject object=new JSONObject();
+        object.put("aaa","123");
+        System.out.println(object.getString("aaa"));
 
 //        LinearHttp.create(HttpTest.class)//定义需要使用的接口类
 //                .query(a -> a.heartBeat(3))//指定网络请求方法并填充参数

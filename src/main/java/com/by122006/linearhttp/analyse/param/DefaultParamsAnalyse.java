@@ -54,7 +54,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 for (int a = 0; a < len; a++) {
                     Object item = Array.get(value, a);
                     if (a != 0) re.append(",");
-                    re.append(JSON.toJSONString(item));
+                    re.append(isBaseType(item)?item:JSON.toJSONString(item));
                 }
                 str.append(name)
                         .append("=")
@@ -64,7 +64,7 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
                 StringBuilder re = new StringBuilder();
                 while (iterator.hasNext()) {
                     Object string = iterator.next();
-                    re.append(JSON.toJSONString(string));
+                    re.append(isBaseType(string)?string:JSON.toJSONString(string));
                     if (iterator.hasNext()) re.append(",");
                 }
                 str.append(name)
@@ -114,5 +114,19 @@ public class DefaultParamsAnalyse implements IParamsAnalyse {
         return iRequestHandler.post(header.toArray(new String[0]), url, str);
     }
 
+    public static boolean isBaseType(Object object) {
+        Class className = object.getClass();
+        if (className.equals(java.lang.Integer.class) ||
+                className.equals(java.lang.Byte.class) ||
+                className.equals(java.lang.Long.class) ||
+                className.equals(java.lang.Double.class) ||
+                className.equals(java.lang.Float.class) ||
+                className.equals(java.lang.Character.class) ||
+                className.equals(java.lang.Short.class) ||
+                className.equals(java.lang.Boolean.class)) {
+            return true;
+        }
+        return false;
+    }
 
 }
